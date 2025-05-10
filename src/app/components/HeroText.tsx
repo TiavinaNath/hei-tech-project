@@ -7,7 +7,7 @@ const HeroText = () => {
       <h1 className={styles["hero-title"]}>
       <span>
       Plus de galère,<br />
-      ton <span className={styles.highlight}>prestataire</span> gère
+      ton <span className={styles.highlight}>Prestataire</span> gère
       </span>
       </h1>
       <p className={styles["hero-subtitle"]}>

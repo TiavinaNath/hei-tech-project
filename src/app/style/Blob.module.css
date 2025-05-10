@@ -65,7 +65,60 @@
     border-radius: 10px;
     z-index: 2;
   }
-  
+
+.infoBoxTopLeft,
+.infoBoxBottomLeft,
+.infoBoxTopRight,
+.infoBoxBottomRight {
+  position: absolute;
+  background: white;
+  padding: 10px 16px;
+  border-radius: 14px;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  font-size: 0.85rem;
+  z-index: 3;
+  width: 140px;
+  animation: float 4s ease-in-out infinite;
+  transition: transform 0.3s ease;
+}
+
+.infoBoxTopLeft {
+  top: 20px;
+  left: -120px;
+  --rotate-angle: -5deg;
+}
+
+
+.infoBoxBottomLeft {
+  bottom: 50px;
+  left: -120px;
+  --rotate-angle: 4deg;
+}
+
+.infoBoxTopRight {
+  top: -30px;
+  right: -120px;
+  --rotate-angle: 3deg;
+}
+
+.infoBoxBottomRight {
+  bottom: 200px;
+  right: -120px;
+  --rotate-angle: -4deg;
+}
+
+
+  @keyframes float {
+  0%, 100% {
+    transform: translateY(0) rotate(var(--rotate-angle));
+  }
+  50% {
+    transform: translateY(-8px) rotate(var(--rotate-angle));
+  }
+}
+
+
   @keyframes morph {
     0%, 100% {
       border-radius: 60% 40% 60% 40% / 50% 50% 60% 40%;
