@@ -1,6 +1,12 @@
 import Link from "next/link";
+import React from "react";
 
-export default function WelcomeSection() {
+interface WelcomeSectionProps {
+  title: string;
+  lines: string[];
+}
+
+export default function WelcomeSection( {title, lines} : WelcomeSectionProps) {
   return (
     <div className="relative flex w-full items-center justify-center bg-white p-8 md:w-1/2">
       <div
@@ -15,18 +21,19 @@ export default function WelcomeSection() {
         <h1 className="text-4xl font-bold leading-tight text-gray-900">
           <span className="block">Bienvenue</span>
           <span className="relative inline-block">
-            <span className="text-[#457bed]">Chez Nous</span>
+            <span className="text-[#457bed]">{title}</span>
             <span className="absolute -bottom-2 left-0 h-1 w-full bg-gradient-to-r from-transparent via-[#457bed] to-transparent"></span>
           </span>
         </h1>
 
-        <p className="mt-10 text-gray-600">
-          Entrez dans un monde où vos besoins rencontrent les bonnes mains,
-          <br />
-          Créez votre compte et laissez vos projets s’épanouir,
-          <br />
-          Simple, rapide, sans limite.
-        </p>
+        <p className="mt-12 text-gray-600">
+      {lines.map((line, index) => (
+        <React.Fragment key={index}>
+          {line}
+          {index < lines.length - 1 && <br />}
+        </React.Fragment>
+      ))}
+    </p>
 
         <div className="mt-8">
           <p className="text-gray-500">Vous avez déjà un compte?</p>
