@@ -4,9 +4,10 @@ import React from "react";
 interface WelcomeSectionProps {
   title: string;
   lines: string[];
+  isLoginPage?: boolean;
 }
 
-export default function WelcomeSection( {title, lines} : WelcomeSectionProps) {
+export default function WelcomeSection({ title, lines, isLoginPage }: WelcomeSectionProps) {
   return (
     <div className="relative flex w-full items-center justify-center bg-white p-8 md:w-1/2">
       <div
@@ -27,21 +28,25 @@ export default function WelcomeSection( {title, lines} : WelcomeSectionProps) {
         </h1>
 
         <p className="mt-12 text-gray-600">
-      {lines.map((line, index) => (
-        <React.Fragment key={index}>
-          {line}
-          {index < lines.length - 1 && <br />}
-        </React.Fragment>
-      ))}
-    </p>
+          {lines.map((line, index) => (
+            <React.Fragment key={index}>
+              {line}
+              {index < lines.length - 1 && <br />}
+            </React.Fragment>
+          ))}
+        </p>
 
         <div className="mt-8">
-          <p className="text-gray-500">Vous avez déjà un compte?</p>
+          <p className="text-gray-500">
+            {isLoginPage
+              ? "Vous n'avez pas encore de compte?"
+              : "Vous avez déjà un compte?"}
+          </p>
           <Link
-            href="/auth/login"
+            href={isLoginPage ? "/auth/signup" : "/auth/login"}
             className="mt-4 inline-block rounded-lg border border-[#457bed] px-6 py-2 font-medium text-[#457bed] transition-all hover:bg-[#457bed] hover:text-white"
           >
-            Se connecter
+            {isLoginPage ? "S'inscrire" : "Se connecter"}
           </Link>
         </div>
       </div>

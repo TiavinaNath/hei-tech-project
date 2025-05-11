@@ -13,6 +13,7 @@ export default function SignupPageProvider() {
             "Créez votre profil et faites briller votre savoir-faire,",
             "Simple, rapide, sans limite.",
           ]}
+          isLoginPage={false}
         />
         <SignUpFormUI
           onSubmit={() => console.log("Inscription prestataire soumise")}
