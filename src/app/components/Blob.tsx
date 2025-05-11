@@ -9,7 +9,6 @@ const Blob = () => {
         <div className={styles.blob}></div>
         <img src={myImage.src} alt="Ma photo" className={styles.image} />
 
-        {/* Info boxes */}
         <div className={styles.infoBoxTopLeft}>
           <h4>Prestataires inscrits</h4>
           <p>120+ Experts</p>

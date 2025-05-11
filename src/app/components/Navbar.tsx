@@ -9,8 +9,9 @@ const Navbar = () => {
       <h1 className="text-xl font-bold text-black">HEI Tech</h1>
       <div className="space-x-4 text-black">
         <Link href="/">Accueil</Link>
-        <Link href="/Autre">Autre</Link>
-        <Link href="/2">Autre2</Link>
+        <Link href="/Autre">Devenir Prestataire</Link>
+        <Link href="/2">Connexion</Link>
+        <Link href="/2">Inscription</Link>
       </div>
     </nav>
   );
