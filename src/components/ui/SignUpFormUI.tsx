@@ -1,71 +1,130 @@
 "use client";
+import { COMMON_FIELDS } from "./FormFields/CommonFields";
+import { PROVIDER_FIELDS } from "./FormFields/ProviderFields";
+import FormStep from "./FormStep";
+import { useState } from "react";
 
 interface AuthFormProps {
   onSubmit: () => void;
+  userType: "client" | "provider";
 }
 
-export default function AuthForm({ onSubmit }: AuthFormProps) {
+export default function SignUpFormUI({ onSubmit, userType }: AuthFormProps) {
+  const [step, setStep] = useState(1);
+  const [formData, setFormData] = useState({});
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value, type, checked } = e.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === "checkbox" ? checked : value,
+    }));
+  };
+
+  const handleNext = () => setStep(step + 1);
+
   return (
     <div className="flex w-full items-center justify-center bg-white p-0 md:w-1/2">
       <div className="h-full w-full p-8">
-        <div className="mb-8 text-center">
-          <h2 className="text-3xl font-bold text-gray-900">
-            <span className="text-[#457bed]">Compte</span>
-          </h2>
-        </div>
-
-        <form onSubmit={onSubmit} className="mx-auto max-w-md space-y-4">
-          {[
-            { id: "last_name", label: "Nom", placeholder: "Entrez votre nom" },
-            {
-              id: "first_name",
-              label: "Prénom",
-              placeholder: "Entrez votre prénom",
-            },
-            {
-              id: "email",
-              label: "Email",
-              type: "email",
-              placeholder: "Entrez votre email",
-            },
-            {
-              id: "mdp",
-              label: "Mot de passe",
-              type: "password",
-              placeholder: "Créez un mot de passe",
-            },
-            {
-              id: "mdp_confirmation",
-              label: "Confirmer le mot de passe",
-              type: "password",
-              placeholder: "Confirmez votre mot de passe",
-            },
-          ].map((field) => (
-            <div key={field.id}>
-              <label
-                htmlFor={field.id}
-                className="mb-1 block text-sm font-medium text-gray-700"
-              >
-                {field.label}
-              </label>
-              <input
-                id={field.id}
-                name={field.id}
-                type={field.type || "text"}
-                required
-                className="w-full rounded-lg border border-gray-200 px-4 py-2 focus:border-[#457bed] focus:outline-none focus:ring-2 focus:ring-[#457bed]/50"
-                placeholder={field.placeholder}
-              />
+        {userType === "client" ? (
+          <>
+            <div className="mb-8 text-center">
+              <h2 className="text-3xl font-bold text-gray-900">
+                <span className="text-[#457bed]">Inscription</span>
+              </h2>
             </div>
-          ))}
 
-          <button
-            type="submit"
-            className="mt-6 w-full rounded-lg bg-[#457bed] px-6 py-3 font-medium text-white transition-all hover:bg-[#3a6bd6] focus:outline-none focus:ring-4 focus:ring-[#457bed]/50"
-          >
-            S'inscrire
-          </button>
-        </form>
+            <form onSubmit={onSubmit} className="mx-auto max-w-md space-y-4">
+              <FormStep
+                fields={COMMON_FIELDS}
+                values={formData}
+                onChange={handleChange}
+              />
+
+              <button
+                type="submit"
+                className="mt-6 w-full rounded-lg bg-[#457bed] px-6 py-3 font-medium text-white transition-all hover:bg-[#3a6bd6]"
+              >
+                S'inscrire
+              </button>
+            </form>
+          </>
+        ) : (
+          <>
+            <div className="mb-8 text-center">
+              <h2>
+                <span className="text-3xl font-bold text-[#457bed]">Inscription</span>{" "}
+                <span className="text-sm text-gray-500">({step}/4)</span>
+              </h2>
+            </div>
+
+            <form
+              onSubmit={step === 4 ? onSubmit : (e) => e.preventDefault()}
+              className="mx-auto max-w-md space-y-4"
+            >
+              {step === 1 && (
+                <FormStep
+                  fields={COMMON_FIELDS}
+                  values={formData}
+                  onChange={handleChange}
+                />
+              )}
+
+              {step === 2 && (
+                <FormStep
+                  fields={PROVIDER_FIELDS.step2}
+                  values={formData}
+                  onChange={handleChange}
+                />
+              )}
+
+              {step === 3 && (
+                <FormStep
+                  fields={PROVIDER_FIELDS.step3}
+                  values={formData}
+                  onChange={handleChange}
+                />
+              )}
+
+              {step === 4 && (
+                <FormStep
+                  fields={PROVIDER_FIELDS.step4}
+                  values={formData}
+                  onChange={handleChange}
+                />
+              )}
+
+              <div className="flex justify-between">
+                {step > 1 && (
+                  <button
+                    type="button"
+                    onClick={() => setStep(step - 1)}
+                    className="rounded-lg border border-[#457bed] px-6 py-3 font-medium text-[#457bed]"
+                  >
+                    Retour
+                  </button>
+                )}
+
+                {step < 4 ? (
+                  <button
+                    type="button"
+                    onClick={handleNext}
+                    className="ml-auto rounded-lg bg-[#457bed] px-6 py-3 font-medium text-white hover:bg-[#3a6bd6]"
+                  >
+                    Suivant
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    className="ml-auto rounded-lg bg-[#00c896] px-6 py-3 font-medium text-white hover:bg-[#00b386]"
+                  >
+                    Finaliser l'inscription
+                  </button>
+                )}
+              </div>
+            </form>
+          </>
+        )}
       </div>
     </div>
   );
