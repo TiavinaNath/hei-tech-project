@@ -13,6 +13,7 @@ export default function SignupPageClient() {
             "Créez votre compte et laissez vos projets s’épanouir,",
             "Simple, rapide, sans limite.",
           ]}
+          isLoginPage={false}
         />
         <SignUpFormUI
           onSubmit={() => console.log("Inscription client soumise")}
