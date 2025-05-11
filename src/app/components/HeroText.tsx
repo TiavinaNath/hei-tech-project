@@ -6,8 +6,8 @@ const HeroText = () => {
     <section className={styles.hero}>
       <h1 className={styles["hero-title"]}>
       <span>
-        Plus de galère,<br />
-        ton <span className={styles.highlight}>prestataire</span> gère
+      Plus de galère,<br />
+      ton <span className={`${styles.highlight} ${styles.underline}`}>Prestataire</span><br />gère
       </span>
       </h1>
       <p className={styles["hero-subtitle"]}>

@@ -1,13 +1,14 @@
 import Blob from '../components/Blob';
 import HeroText from '../components/HeroText';
+import styles from '../style/HomePage.module.css';
 
-export default function LandingPage() {
+export default function HomePage() {
   return (
-    <div style={{ display: 'flex', height: '100vh' , background: 'linear-gradient(to bottom right, #F5F5F4, #EAEAEA)'}}>
-      <div style={{ flex: 1 }}>
+    <div className={styles.container}>
+      <div className={styles.halfSection}>
         <HeroText />
       </div>
-      <div style={{ flex: 1 }}>
+      <div className={styles.halfSection}>
         <Blob />
       </div>
     </div>
