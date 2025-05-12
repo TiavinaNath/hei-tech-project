@@ -1,5 +1,5 @@
 "use client";
-import SignUpFormUI from "@/components/ui/SignUpFormUI";
+import ClientSignUpForm from "@/components/ui/ClientSignUpForm";
 import WelcomeSection from "@/components/ui/WelcomeSection";
 
 export default function SignupPageClient() {
@@ -15,10 +15,7 @@ export default function SignupPageClient() {
           ]}
           isLoginPage={false}
         />
-        <SignUpFormUI
-          onSubmit={() => console.log("Inscription client soumise")}
-          userType="client"
-        />
+        <ClientSignUpForm onSubmit={() => {console.log("submitted client")}}/>
       </div>
     </div>
   );

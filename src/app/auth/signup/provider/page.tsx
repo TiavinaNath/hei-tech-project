@@ -1,5 +1,5 @@
 "use client";
-import SignUpFormUI from "@/components/ui/SignUpFormUI";
+import ProviderSignUpForm from "@/components/ui/ProviderSignUpForm";
 import WelcomeSection from "@/components/ui/WelcomeSection";
 
 export default function SignupPageProvider() {
@@ -15,10 +15,7 @@ export default function SignupPageProvider() {
           ]}
           isLoginPage={false}
         />
-        <SignUpFormUI
-          onSubmit={() => console.log("Inscription prestataire soumise")}
-          userType="provider"
-        />
+        <ProviderSignUpForm onSubmit={() => console.log("submitted provider")}/>
       </div>
     </div>
   );
