@@ -1,36 +1,39 @@
 "use client";
-import { COMMON_FIELDS } from "../../ui/FormFields/CommonFields";
-import FormStep from "../../ui/FormStep";
-import { useState } from "react";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { COMMON_FIELDS } from "@/components/ui/FormFields/CommonFields";
+import FormStep from "@/components/ui/FormStep";
+import { SignUpUserFormData, signUpUserSchema } from "@/lib/validators/user";
 
 interface ClientSignUpFormProps {
-  onSubmit: (formData: Record<string, string>) => void;
+  onSubmit: (data: SignUpUserFormData) => Promise<void>;
 }
 
 export default function ClientSignUpForm({ onSubmit }: ClientSignUpFormProps) {
-  const initialFormData = {
-    last_name: "",
-    first_name: "",
-    email: "",
-    password: "",
-    password_confirmation: "",
-  };
-  
-  const [formData, setFormData] = useState<Record<string, string>>(initialFormData);
+  const {
+    register,
+    handleSubmit,
+    reset,
+    watch,
+    formState: { errors, isSubmitting },
+  } = useForm<SignUpUserFormData>({
+    resolver: zodResolver(signUpUserSchema),
+    defaultValues: {
+      first_name: "",
+      last_name: "",
+      email: "",
+      password: "",
+      password_confirmation: "",
+    },
+  });
 
-  const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    onSubmit(formData);
+  const processSubmit = async (data: SignUpUserFormData) => {
+    try {
+      await onSubmit(data);
+      reset();
+    } catch (error) {
+      console.error("Erreur lors de l'inscription :", error);
+    }
   };
 
   return (
@@ -42,18 +45,23 @@ export default function ClientSignUpForm({ onSubmit }: ClientSignUpFormProps) {
           </h2>
         </div>
 
-        <form onSubmit={handleSubmit} className="mx-auto max-w-md space-y-4">
+        <form
+          onSubmit={handleSubmit(processSubmit)}
+          className="mx-auto max-w-md space-y-4"
+        >
           <FormStep
             fields={COMMON_FIELDS}
-            values={formData}
-            onChange={handleChange}
+            register={register}
+            errors={errors}
+            watch={watch}
           />
 
           <button
             type="submit"
-            className="mt-6 w-full rounded-lg bg-[#457bed] px-6 py-3 font-medium text-white transition-all hover:bg-[#3a6bd6]"
+            disabled={isSubmitting}
+            className="mt-6 w-full rounded-lg bg-[#457bed] px-6 py-3 font-medium text-white transition-all hover:bg-[#3a6bd6] disabled:opacity-70"
           >
-            S'inscrire
+            {isSubmitting ? "Inscription en cours..." : "S'inscrire"}
           </button>
         </form>
       </div>
