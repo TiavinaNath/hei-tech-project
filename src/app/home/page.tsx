@@ -1,7 +1,6 @@
 import Blob from '../components/Blob'
 import HeroText from '../components/HeroText'
 import styles from '../style/HomePage.module.css'
-import TopProvider from '../components/TopProvider'
 import ServicesSlider from '../components/ServicesSlider'
 
 export default function HomePage() {
