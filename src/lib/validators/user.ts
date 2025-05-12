@@ -15,7 +15,8 @@ export const signUpUserSchema = z.object({
         .regex(/[A-Z]/, "Le mot de passe doit contenir au moins une majuscule")
         .regex(/[0-9]/, "Le mot de passe doit contenir au moins un chiffre"),
 
-    password_confirmation: z.string()
+    password_confirmation: z.string(),
+    role: z.literal("user").default("user")
 }).refine(
     (data) => data.password === data.password_confirmation,
     {

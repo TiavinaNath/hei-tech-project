@@ -1,11 +1,11 @@
 "use client";
+import { registerUser } from "@/app/actions/auth";
 import ClientSignUpForm from "@/components/features/auth/ClientSignUpForm";
 import WelcomeSection from "@/components/ui/WelcomeSection";
 
 export default function SignupPageClient() {
-
   const handleSubmit = async (formData: Record<string, string>) => {
-    console.log("Données du formulaire:", formData);
+    await registerUser(formData);
   };
 
   return (
@@ -20,7 +20,7 @@ export default function SignupPageClient() {
           ]}
           isLoginPage={false}
         />
-        <ClientSignUpForm onSubmit={handleSubmit}/>
+        <ClientSignUpForm onSubmit={handleSubmit} />
       </div>
     </div>
   );
