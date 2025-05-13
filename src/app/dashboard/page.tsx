@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase/client' // ✅ bon import
+import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 
 export default function MyRequestPage() {
@@ -15,9 +15,6 @@ export default function MyRequestPage() {
         error: sessionError,
       } = await supabase.auth.getSession()
 
-      
-console.log("Session : ", session)
-
       if (sessionError || !session?.user) {
         console.error('Utilisateur non connecté ou erreur session:', sessionError)
         setLoading(false)
@@ -30,9 +27,6 @@ console.log("Session : ", session)
         .from('client_requests')
         .select('title, description, preferred_date_time, status')
         .eq('client_id', userId)
-
-        console.log("Data reçue :", data)
-console.log("Erreur de Supabase :", error)
 
       if (error) {
         console.error('Erreur lors du fetch:', error)
