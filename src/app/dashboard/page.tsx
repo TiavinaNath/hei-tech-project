@@ -4,10 +4,12 @@ import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
 import styles from '../style/MyRequestCard.module.css'
+import { useRouter } from 'next/navigation'
 
 export default function MyRequestPage() {
   const [requests, setRequests] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
+  const router = useRouter()
 
   useEffect(() => {
     const fetchRequests = async () => {
@@ -79,7 +81,12 @@ export default function MyRequestPage() {
               : 'Not specified'}
               </p>
               <p className="text-m line-clamp-">{req.address_text}</p>
-              <button className={styles.button}>Voir plus</button>
+              <button
+              className={styles.button}
+              onClick={() => router.push(`/dashboard/${req.id}`)}
+            >
+            Voir plus
+            </button>
               </div>
             </div>
           ))}
