@@ -1,7 +1,7 @@
-import Blob from '../components/Blob'
-import HeroText from '../components/HeroText'
+import Blob from '../../components/ui/Blob'
+import HeroText from '../../components/ui/HeroText'
 import styles from '../style/HomePage.module.css'
-import TopProvider from '../components/TopProvider'
+import ServicesSlider from '../../components/features/accueil/ServicesSlider'
 
 export default function HomePage() {
   return (
@@ -17,7 +17,11 @@ export default function HomePage() {
 
       <div className="p-6">
          <h1 className="text-2xl font-semibold mb-4">Top prestataires</h1>
-        <TopProvider />
+      </div>
+
+      <div className="p-6">
+        <h1 className="text-2xl font-semibold mb-4">Services</h1>
+        <ServicesSlider />
       </div>
     </div>
   )
