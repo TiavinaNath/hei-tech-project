@@ -25,7 +25,15 @@ export default function MyRequestPage() {
 
       const { data, error } = await supabase
         .from('client_requests')
-        .select('title, description, preferred_date_time, status')
+        .select(`
+          id,
+          title,
+          description,
+          preferred_date_time,
+          address_text,
+          status,
+          offers(count)
+        `)
         .eq('client_id', userId)
 
       if (error) {
@@ -58,10 +66,16 @@ export default function MyRequestPage() {
               <p>{req.description}</p>
               <p>
                 <strong>Date préférée :</strong>{' '}
-                {format(new Date(req.preferred_date_time), 'dd/MM/yyyy HH:mm')}
+                {req.preferred_date_time
+                  ? format(new Date(req.preferred_date_time), 'dd/MM/yyyy HH:mm')
+                  : 'Non spécifiée'}
               </p>
               <p>
-                <strong>Statut :</strong> {req.status}
+                <strong>Adresse de la prestation :</strong> {req.address_text}
+              </p>
+              <p>
+                <strong>Nombre d'offres reçues :</strong>{' '}
+                {req.offers?.[0]?.count ?? 0}
               </p>
             </li>
           ))}
