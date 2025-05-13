@@ -1,14 +1,18 @@
 import React from 'react';
-import styles from '../style/HeroText.module.css';
+import styles from '@/app/style/HeroText.module.css';
 
-const HeroText = () => {
+type Props = {
+  onOpenModal: () => void;
+};
+
+const HeroText = ({ onOpenModal }: Props) => {
   return (
     <section className={styles.hero}>
       <h1 className={styles["hero-title"]}>
-      <span>
-      Plus de galère,<br />
-      ton <span className={`${styles.highlight} ${styles.underline}`}>Prestataire</span><br />gère
-      </span>
+        <span>
+          Plus de galère,<br />
+          ton <span className={`${styles.highlight} ${styles.underline}`}>Prestataire</span><br />gère
+        </span>
       </h1>
       <p className={styles["hero-subtitle"]}>
         Using our app you can manage your team and upgrade <br />
@@ -16,7 +20,7 @@ const HeroText = () => {
       </p>
       <div className={styles["search-section"]}>
         <input type="search" placeholder="search here" />
-        <button>Allons-y</button>
+        <button onClick={onOpenModal}>Allons-y</button>
       </div>
     </section>
   );

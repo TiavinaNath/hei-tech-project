@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from '../style/Blob.module.css';
+import styles from '@/app/style/Blob.module.css';
 import myImage from '../../assets/heroImage.png';
 
 const Blob = () => {
