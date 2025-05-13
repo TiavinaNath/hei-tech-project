@@ -1,20 +1,18 @@
 import './globals.css'
-import Navbar from '../components/ui/Navbar'
+import StaticNavbarWrapper from '@/components/features/accueil/StaticNavbarWrapper'
 
 export const metadata = {
-  title: 'HEI Tech'
+  title: 'HEI Tech',
 }
 
-export default function RootLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="fr">
       <body>
-        <Navbar />
-        {children}
+        {/* Affiche le Navbar uniquement sur la home page */}
+        <StaticNavbarWrapper>
+          {children}
+        </StaticNavbarWrapper>
       </body>
     </html>
   )
