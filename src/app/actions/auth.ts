@@ -56,7 +56,7 @@ export async function registerUser(data: Record<string, string>) {
         console.error('Erreur d\'inscription:', error)
         throw error
     }
-    redirect('/test')
+    redirect('/dashboard')
 }
 
 
@@ -82,5 +82,5 @@ export async function loginUser(credentials: { email: string, password: string }
         console.error("Erreur dans loginUser:", error)
         throw error
     }
-    redirect('/test')
+    redirect('/dashboard')
 }
