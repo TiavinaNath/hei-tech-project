@@ -5,6 +5,7 @@ import WelcomeSection from "@/components/ui/WelcomeSection";
 
 export default function SignupPageClient() {
   const handleSubmit = async (formData: Record<string, string>) => {
+    console.log(formData);
     await registerUser(formData);
   };
 
