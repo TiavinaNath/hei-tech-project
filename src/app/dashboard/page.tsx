@@ -1,7 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase } from '@/lib/supabase/client' // ✅ bon import
 import { format } from 'date-fns'
 
 export default function MyRequestPage() {
@@ -10,9 +10,29 @@ export default function MyRequestPage() {
 
   useEffect(() => {
     const fetchRequests = async () => {
+      const {
+        data: { session },
+        error: sessionError,
+      } = await supabase.auth.getSession()
+
+      
+console.log("Session : ", session)
+
+      if (sessionError || !session?.user) {
+        console.error('Utilisateur non connecté ou erreur session:', sessionError)
+        setLoading(false)
+        return
+      }
+
+      const userId = session.user.id
+
       const { data, error } = await supabase
         .from('client_requests')
         .select('title, description, preferred_date_time, status')
+        .eq('client_id', userId)
+
+        console.log("Data reçue :", data)
+console.log("Erreur de Supabase :", error)
 
       if (error) {
         console.error('Erreur lors du fetch:', error)
@@ -27,23 +47,20 @@ export default function MyRequestPage() {
   }, [])
 
   return (
-    <div>
-      <h1>Mes demandes</h1>
+    <div className="p-6">
+      <h1 className="text-2xl font-semibold mb-4">Mes demandes</h1>
       {loading ? (
         <p>Chargement...</p>
+      ) : requests.length === 0 ? (
+        <p>Aucune demande trouvée.</p>
       ) : (
-        <ul style={{ padding: 0, listStyle: 'none' }}>
+        <ul className="space-y-4">
           {requests.map((req, index) => (
             <li
               key={index}
-              style={{
-                border: '1px solid #ccc',
-                padding: '1rem',
-                marginBottom: '1rem',
-                borderRadius: '8px',
-              }}
+              className="border border-gray-300 p-4 rounded-lg shadow-sm"
             >
-              <h3>{req.title}</h3>
+              <h3 className="text-lg font-bold">{req.title}</h3>
               <p>{req.description}</p>
               <p>
                 <strong>Date préférée :</strong>{' '}
