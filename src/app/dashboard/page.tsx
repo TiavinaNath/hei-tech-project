@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
+import styles from '../style/MyRequestCard.module.css'
 
 export default function MyRequestPage() {
   const [requests, setRequests] = useState<any[]>([])
@@ -32,7 +33,8 @@ export default function MyRequestPage() {
           preferred_date_time,
           address_text,
           status,
-          offers(count)
+          offers(count),
+          services(name)
         `)
         .eq('client_id', userId)
 
@@ -49,37 +51,39 @@ export default function MyRequestPage() {
   }, [])
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-semibold mb-4">Mes demandes</h1>
+    <div>
+      <h1>Mes demandes</h1>
+
       {loading ? (
         <p>Chargement...</p>
       ) : requests.length === 0 ? (
         <p>Aucune demande trouvée.</p>
       ) : (
-        <ul className="space-y-4">
+        <div style={{display: 'flex', flexDirection: 'row'}}>
           {requests.map((req, index) => (
-            <li
-              key={index}
-              className="border border-gray-300 p-4 rounded-lg shadow-sm"
-            >
-              <h3 className="text-lg font-bold">{req.title}</h3>
-              <p>{req.description}</p>
-              <p>
-                <strong>Date préférée :</strong>{' '}
-                {req.preferred_date_time
-                  ? format(new Date(req.preferred_date_time), 'dd/MM/yyyy HH:mm')
-                  : 'Non spécifiée'}
+            <div key={index} className={styles.card}>
+              <div>
+            <img
+            src="https://d1vrukq96dal30.cloudfront.net/assets/categories/2001-142be5d05e49ce8efdb83c97b816c85afd7627924212dde9b035aae1aa14fdb1.svg"
+            alt="avatar"
+            className={styles.avatar}
+            />
+              </div>
+              <div style={{display: 'flex', flexDirection: 'column', width: '100%', gap: '0.5em'}}>
+              <h3 className = "text-lg font-semibold text-gray-800 line-clamp-1">{req.title}</h3>
+              <p className="text-sm text-gray-500 line-clamp-2">{req.description}</p>
+              <p className={styles.details}>
+              {' '}
+              {req.preferred_date_time
+               ? `${format(new Date(req.preferred_date_time), 'EEEE, MMMM dd, yyyy')} at ${format(new Date(req.preferred_date_time), 'HH:mm')}`
+              : 'Not specified'}
               </p>
-              <p>
-                <strong>Adresse de la prestation :</strong> {req.address_text}
-              </p>
-              <p>
-                <strong>Nombre d'offres reçues :</strong>{' '}
-                {req.offers?.[0]?.count ?? 0}
-              </p>
-            </li>
+              <p className="text-m line-clamp-">{req.address_text}</p>
+              <button className={styles.button}>Voir plus</button>
+              </div>
+            </div>
           ))}
-        </ul>
+        </div>
       )}
     </div>
   )
