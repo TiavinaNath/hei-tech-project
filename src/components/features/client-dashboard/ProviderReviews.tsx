@@ -1,7 +1,7 @@
 export default function ProviderReviews({ reviews }: { reviews: any[] }) {
   return (
-    <div className="mt-2 border-t pt-2 text-sm text-gray-700">
-      <p className="font-semibold">⭐ Avis reçus :</p>
+    <div className="mt-2 pt-2 text-sm text-gray-700">
+      <p className="font-semibold"> Avis reçus :</p>
       <ul className="list-disc ml-5">
         {reviews.map((review, index) => (
           <li key={index}>
