@@ -1,7 +1,6 @@
 'use client';
 
 import { useServices } from '@/contexts/ServicesContext';
-import { useRequest } from '@/contexts/RequestContext';
 import { useRouter } from 'next/navigation';
 
 type Props = {
@@ -11,15 +10,13 @@ type Props = {
 
 const ServiceModal = ({ isOpen, onClose }: Props) => {
   const services = useServices();
-  const { setData } = useRequest();
   const router = useRouter();
 
   if (!isOpen) return null;
 
   const handleSelect = (serviceId: string) => {
-    setData({ serviceId });
-    onClose();
-    router.push('/request/date'); // ou une autre route selon ton routing
+  localStorage.setItem('selectedServiceId', serviceId);
+  router.push('/request/date');
   };
 
   return (

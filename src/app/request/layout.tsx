@@ -4,14 +4,15 @@ import { RequestProvider, useRequest } from '@/contexts/RequestContext';
 import { usePathname, useRouter } from 'next/navigation';
 import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabaseClient';
 
-const steps = ['/request/date', '/request/time', '/request/address', '/request/details'];
+const steps = ['/request/date', '/request/time', '/request/address', '/request/phone', '/request/details'];
 
 export default function RequestLayout({ children }: { children: ReactNode }) {
   return (
-    <RequestProvider>
-      <StepLayout>{children}</StepLayout>
-    </RequestProvider>
+      <RequestProvider>
+        <StepLayout>{children}</StepLayout>
+      </RequestProvider>
   );
 }
 
@@ -37,6 +38,9 @@ function StepLayout({ children }: { children: ReactNode }) {
       case '/request/address':
         setCanProceed(!!data.address);
         break;
+      case '/request/phone':
+        setCanProceed(!!data.phone);
+        break;
       case '/request/details':
         setCanProceed(!!data.title && !!data.description);
         break;
@@ -51,15 +55,49 @@ function StepLayout({ children }: { children: ReactNode }) {
     }
   };
 
-  const handleNext = () => {
+
+
+  const handleNext = async () => {
     if (!isLastStep) {
-      router.push(steps[currentStepIndex + 1]);
-    } else {
-      // Ici tu postes la demande (API call possible)
-      alert('Demande postée avec succès !');
-      console.log('Données de la demande :', data);
-      // router.push('/request/success') par exemple
-    }
+    router.push(steps[currentStepIndex + 1]);
+  } else if (!data.userId || !data.serviceId || !data.date || !data.time || !data.coordinates) {
+    alert("Données incomplètes !");
+    return;
+  } else {
+  // Crée un datetime combiné (format ISO)
+  const dateOnly = data.date.split('T')[0]; // "2025-04-26"
+  const preferredDateTime = new Date(`${dateOnly}T${data.time}:00`);
+
+  const requestPayload = {
+    client_id: data.userId,
+    service_id: data.serviceId,
+    title: data.title ?? '',
+    description: data.description ?? '',
+    address_text: data.address ?? '',
+    location: `POINT(${data.coordinates.lon} ${data.coordinates.lat})`,
+    is_public: true,
+    target_provider_id: null,
+    preferred_date_time: preferredDateTime.toISOString(),
+    contact_phone: data.phone ?? '',
+    status: 'PENDING',
+    agreed_price: null,
+    agreed_notes: null,
+  };
+
+  const { data: insertedRequest, error } = await supabase
+    .from('client_requests')
+    .insert([requestPayload])
+    .select();
+
+  if (error) {
+    console.error('Erreur Supabase:', error.message);
+    alert("Une erreur est survenue !");
+  } else {
+    console.log('Demande postée :', insertedRequest);
+    // Redirige vers la page de succès
+    //router.push('/request/success');
+  }
+}
   };
 
   return (
