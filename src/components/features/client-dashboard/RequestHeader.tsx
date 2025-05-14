@@ -6,7 +6,7 @@ export default function RequestHeader({ request }: { request: any }) {
     <div className="relative w-full max-w-[800px] mx-auto">
       {/* Carte principale AVEC TROU */}
       <div
-        className="relative bg-white rounded-3xl shadow-xl z-10 overflow-hidden pt-10 transition-transform duration-300 ease-in-out hover:scale-105 hover:shadow-2xl"
+        className="relative bg-white rounded-3xl shadow-xl z-10 overflow-hidden pt-10"
         style={{
           WebkitMaskImage: 
             'radial-gradient(circle 28px at center top, transparent 0px, transparent 20px, white 21px)',
@@ -25,7 +25,7 @@ export default function RequestHeader({ request }: { request: any }) {
             <div className="flex-1 space-y-3">
               {/* Titre */}
               <div className="flex items-center gap-2 text-[#457bed]">
-                <h1 className="text-xl md:text-2xl font-bold transition-transform duration-300 hover:scale-105">
+                <h1 className="text-xl md:text-2xl font-bold">
                   {request.title}
                 </h1>
               </div>

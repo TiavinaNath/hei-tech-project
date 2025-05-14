@@ -6,9 +6,9 @@ export default function ProviderProfile({ profile }: { profile: any }) {
   const bio = profile.bio ?? 'Non renseigné'
   const isLong = bio.length > 100
   return (
-    <div className="mt-2 pt-2 border-t border-t-stone-200  text-m text-gray-700 space-y-2">
-      <div className="mt-2 pt-2 text-m text-gray-700 space-y-2">
-      <div className="flex items-center">
+    <div className="mt-2 pt-2 border-t border-t-stone-200 text-gray-700 space-y-2">
+      <div className="mt-2 pt-2 text-gray-700 space-y-2">
+      <div className="flex items-center text-sm">
         <p className={`${!showFullBio && isLong ? 'truncate' : ''}`}>
           {showFullBio || !isLong ? bio : bio.slice(0, 100) + '...'}
         </p>
