@@ -18,7 +18,12 @@ export const PROVIDER_FIELDS = {
     { id: "mobile", label: "En déplacement", type: "checkbox" },
   ],
   step3: [
-    { id: "address", label: "Adresse", placeholder: "Votre localisation" },
+    {
+      id: "address",
+      label: "Adresse",
+      placeholder: "Votre localisation",
+      type: "address-autocomplete",
+    },
     {
       id: "service_radius",
       label: "Rayon de déplacement (km)",

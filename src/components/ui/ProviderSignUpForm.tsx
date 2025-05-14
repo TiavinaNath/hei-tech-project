@@ -1,5 +1,4 @@
 "use client";
-
 import {
   step1Schema,
   step2Schema,
@@ -19,7 +18,12 @@ type Step2 = z.infer<typeof step2Schema>;
 type Step3 = z.infer<typeof step3Schema>;
 type Step4 = z.infer<typeof step4Schema>;
 
-type AllSteps = Step1 & Step2 & Step3 & Step4;
+type AllSteps = Step1 &
+  Step2 &
+  Step3 &
+  Step4 & {
+    coordinates?: { lat: number; lon: number };
+  };
 
 interface ProviderSignUpFormProps {
   onSubmit: (data: AllSteps) => Promise<void>;
@@ -38,6 +42,10 @@ export default function ProviderSignUpForm({
 }: ProviderSignUpFormProps) {
   const [step, setStep] = useState(0);
   const [collectedData, setCollectedData] = useState<Partial<AllSteps>>({});
+  const [coordinates, setCoordinates] = useState<{
+    lat: number;
+    lon: number;
+  } | null>(null);
 
   const currentSchema = schemas[step];
   const {
@@ -46,18 +54,27 @@ export default function ProviderSignUpForm({
     trigger,
     getValues,
     watch,
+    setValue,
     formState: { errors, isSubmitting },
   } = useForm({
     resolver: zodResolver(currentSchema),
     defaultValues: collectedData,
   });
 
+  const handleAddressSelect = (lat: number, lon: number) => {
+    setCoordinates({ lat, lon });
+  };
+
   const handleNext = async () => {
     const isValid = await trigger();
     if (!isValid) return;
 
     const currentData = getValues();
-    setCollectedData((prev) => ({ ...prev, ...currentData }));
+    setCollectedData((prev) => ({
+      ...prev,
+      ...currentData,
+      ...(coordinates && { coordinates }), // Ajoute les coordonnées
+    }));
 
     if (step < schemas.length - 1) {
       setStep((prev) => prev + 1);
@@ -65,6 +82,7 @@ export default function ProviderSignUpForm({
       const finalData = {
         ...collectedData,
         ...currentData,
+        coordinates, // Inclut les coordonnées dans les données finales
         role: "PROVIDER",
       } as AllSteps;
       await onSubmit(finalData);
@@ -93,6 +111,11 @@ export default function ProviderSignUpForm({
             register={register}
             errors={errors}
             watch={watch}
+            setValue={setValue}
+            onAddressSelect={(lat, lon) => {
+              setValue("coordinates", { lat, lon });
+              setValue('userLocation', { lat, lon });
+            }}
           />
 
           <div className="mt-6 flex justify-between">
