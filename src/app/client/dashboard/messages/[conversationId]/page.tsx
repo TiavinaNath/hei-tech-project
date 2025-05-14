@@ -17,15 +17,15 @@ export default function ConversationPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
+  const [showProposal, setShowProposal] = useState(false);
+  const [proposalNote, setProposalNote] = useState('');
+  const [proposalPrice, setProposalPrice] = useState('');
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
   // Récupère l'utilisateur courant
   useEffect(() => {
     const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
+      const { data: { session } } = await supabase.auth.getSession();
       setUserId(session?.user?.id ?? null);
     };
 
@@ -44,7 +44,7 @@ export default function ConversationPage() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // Realtime avec Supabase
+  // Realtime
   useEffect(() => {
     if (!conversationId) return;
 
@@ -80,8 +80,41 @@ export default function ConversationPage() {
     });
 
     setMessage('');
-    // Inutile de re-fetch, le realtime se charge de l'ajouter
   };
+
+const handleSendProposal = async () => {
+  if (!proposalPrice || !userId) return;
+
+  // Étape 1 : récupérer request_id depuis conversations
+  const { data: convData, error: convError } = await supabase
+    .from('conversations')
+    .select('request_id')
+    .eq('id', conversationId)
+    .maybeSingle();
+
+  if (convError || !convData?.request_id) {
+    console.error('Erreur récupération du request_id', convError);
+    return;
+  }
+
+  // Étape 2 : insérer la proposition avec request_id
+  const { error } = await supabase.from('final_price_proposals').insert({
+    conversation_id: conversationId,
+    request_id: convData.request_id, // ✅ Important !
+    proposed_by: userId,
+    price: Number(proposalPrice),
+    note: proposalNote,
+  });
+
+  if (error) {
+    console.error('Erreur envoi proposition', error);
+  } else {
+    setShowProposal(false);
+    setProposalNote('');
+    setProposalPrice('');
+  }
+};
+
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
@@ -103,7 +136,7 @@ export default function ConversationPage() {
         <div ref={messagesEndRef} />
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex gap-2 mb-2">
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -116,7 +149,42 @@ export default function ConversationPage() {
         >
           Envoyer
         </button>
+        <button
+          onClick={() => setShowProposal(!showProposal)}
+          className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600"
+        >
+          Conclure un accord
+        </button>
       </div>
+
+      {showProposal && (
+        <div className="border rounded p-4 bg-gray-50 mb-4 shadow">
+          <h2 className="text-lg font-semibold mb-2">Proposition d’accord</h2>
+          <div className="mb-2">
+            <label className="block mb-1">Prix final (€)</label>
+            <input
+              type="number"
+              value={proposalPrice}
+              onChange={(e) => setProposalPrice(e.target.value)}
+              className="w-full border px-3 py-2 rounded"
+            />
+          </div>
+          <div className="mb-2">
+            <label className="block mb-1">Note (optionnelle)</label>
+            <textarea
+              value={proposalNote}
+              onChange={(e) => setProposalNote(e.target.value)}
+              className="w-full border px-3 py-2 rounded"
+            />
+          </div>
+          <button
+            onClick={handleSendProposal}
+            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+          >
+            Envoyer la proposition
+          </button>
+        </div>
+      )}
     </div>
   );
 }
