@@ -38,6 +38,7 @@ export default function FormStep({
               </label>
             )}
 
+            {/* Gestion des différents types de champs */}
             {field.type === "textarea" ? (
               <textarea
                 id={field.id}
@@ -61,6 +62,24 @@ export default function FormStep({
                   {field.label}
                 </label>
               </div>
+            ) : field.type === "file" ? (
+              <input
+                id={field.id}
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  console.log(e.target.files?.[0])
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    // Manuellement injecter le fichier dans formData
+                    (window as any).selectedFiles = {
+                      ...(window as any).selectedFiles,
+                      [field.id]: file,
+                    };
+                  }
+                }}
+                className="w-full rounded-lg border border-gray-200 px-4 py-2 focus:border-[#457bed] focus:outline-none focus:ring-2 focus:ring-[#457bed]/50"
+              />
             ) : (
               <input
                 id={field.id}
