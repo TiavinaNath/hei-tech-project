@@ -16,7 +16,7 @@ const ServiceModal = ({ isOpen, onClose }: Props) => {
 
   const handleSelect = (serviceId: string) => {
   localStorage.setItem('selectedServiceId', serviceId);
-  router.push('/request/date');
+  router.push('/client/request/date');
   };
 
   return (

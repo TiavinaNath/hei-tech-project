@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
-import styles from '../style/MyRequestCard.module.css'
+import styles from '@/app/style/MyRequestCard.module.css'
 import { useRouter } from 'next/navigation'
 
 export default function MyRequestPage() {
@@ -97,7 +97,7 @@ export default function MyRequestPage() {
             <p>{req.offers?.[0]?.count ?? 0} offre(s)</p>
             <button
               className={styles.button}
-              onClick={() => router.push(`/dashboard/${req.id}`)}
+              onClick={() => router.push(`/client/dashboard/${req.id}`)}
             >
               Voir plus
             </button>

@@ -6,7 +6,7 @@ import { ReactNode, useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { supabase } from '@/lib/supabaseClient';
 
-const steps = ['/request/date', '/request/time', '/request/address', '/request/phone', '/request/details'];
+const steps = ['/client/request/date', '/client/request/time', '/client/request/address', '/client/request/phone', '/client/request/details'];
 
 export default function RequestLayout({ children }: { children: ReactNode }) {
   return (
@@ -29,19 +29,19 @@ function StepLayout({ children }: { children: ReactNode }) {
   // Vérification basique de validité pour chaque étape (à adapter)
   useEffect(() => {
     switch (pathname) {
-      case '/request/date':
+      case '/client/request/date':
         setCanProceed(!!data.date);
         break;
-      case '/request/time':
+      case '/client/request/time':
         setCanProceed(!!data.time);
         break;
-      case '/request/address':
+      case '/client/request/address':
         setCanProceed(!!data.address);
         break;
-      case '/request/phone':
+      case '/client/request/phone':
         setCanProceed(!!data.phone);
         break;
-      case '/request/details':
+      case '/client/request/details':
         setCanProceed(!!data.title && !!data.description);
         break;
       default:

@@ -7,9 +7,9 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
 
   const links = [
-    { href: '/dashboard', label: 'Mes demandes', icon: '🔖' },
-    { href: '/dashboard/messages', label: 'Messagerie', icon: '💬' },
-    { href: '/dashboard/account', label: 'Compte', icon: '👤' },
+    { href: '/client/dashboard', label: 'Mes demandes', icon: '🔖' },
+    { href: '/client/dashboard/messages', label: 'Messagerie', icon: '💬' },
+    { href: '/client/dashboard/account', label: 'Compte', icon: '👤' },
   ];
 
   return (
