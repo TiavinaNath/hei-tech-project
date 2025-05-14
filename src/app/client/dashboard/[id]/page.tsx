@@ -40,7 +40,8 @@ export default function RequestDetailsPage() {
                   experience_years,
                   services(name)
                 ),
-                provider_equipments(label)
+                provider_equipments(label),
+                provider_engagements (label)
               ),
               provider_review_counts_by_service(
                 service_name,
@@ -68,7 +69,7 @@ export default function RequestDetailsPage() {
   if (!request) return <p>Demande introuvable.</p>
 
   return (
-    <div className="p-6">
+    <div className="p-6" style={{border: '1px solid red'}}>
       <RequestHeader request={request} />
       <OffersList offers={request.offers} />
     </div>
