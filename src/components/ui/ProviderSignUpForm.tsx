@@ -112,7 +112,10 @@ export default function ProviderSignUpForm({
             errors={errors}
             watch={watch}
             setValue={setValue}
-            onAddressSelect={handleAddressSelect}
+            onAddressSelect={(lat, lon) => {
+              setValue("coordinates", { lat, lon });
+              setValue('userLocation', { lat, lon });
+            }}
           />
 
           <div className="mt-6 flex justify-between">

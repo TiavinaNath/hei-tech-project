@@ -109,8 +109,21 @@ export async function registerProvider(data: Record<string, any>) {
 
         // 3.5 Géocodage adresse (si fournie)
         let fixed_location = null;
-        if (data.address && data.coordinates) {
+
+        // Priorité à la géolocalisation si disponible
+        if (data.userLocation) {
+            fixed_location = `POINT(${data.userLocation.lon} ${data.userLocation.lat})`;
+        }
+        // Sinon utiliser les coordonnées de l'adresse
+        else if (data.address && data.coordinates) {
             fixed_location = `POINT(${data.coordinates.lon} ${data.coordinates.lat})`;
+        }
+        // Fallback: géocodage de l'adresse si pas de coordonnées directes
+        else if (data.address) {
+            const geo = await geocodeAddress(data.address);
+            if (geo) {
+                fixed_location = `POINT(${geo.lon} ${geo.lat})`;
+            }
         }
 
         // 4. Insertion dans `provider_profiles`
