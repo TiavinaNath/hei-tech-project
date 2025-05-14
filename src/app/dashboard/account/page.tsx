@@ -21,28 +21,39 @@ export default async function AccountPage() {
       </div>
 
         {/* Right panel */}
-        <div className="w-2/3 p-8">
-          <h2 className="text-xl font-semibold mb-6">Informations personnelles</h2>
+        <div className="w-full max-w-4xl p-8 mx-auto bg-white shadow-md rounded-2xl">
+  <h2 className="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Informations personnelles</h2>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-800">Nom</label>
-              <p className="mt-1 w-full px-2 py-1">{profile.last_name || '—'}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800">Prénom(s)</label>
-              <p className="mt-1 w-full px-2 py-1">{profile.first_name || '—'}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800">Email</label>
-              <p className="mt-1 w-full px-2 py-1">{user.email}</p>
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-800">Date d'inscription</label>
-              <p className="mt-1 w-full px-2 py-1">{new Date(user.created_at).toLocaleDateString('fr-FR')}</p>
-            </div>
-          </div>
-        </div>
+  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+    <div>
+      <label className="block text-sm font-medium text-gray-600 mb-1">Nom</label>
+      <div className="bg-gray-100 rounded-md px-3 py-2 text-gray-800">
+        {profile.last_name || '—'}
+      </div>
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-600 mb-1">Prénom(s)</label>
+      <div className="bg-gray-100 rounded-md px-3 py-2 text-gray-800">
+        {profile.first_name || '—'}
+      </div>
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-600 mb-1">Email</label>
+      <div className="bg-gray-100 rounded-md px-3 py-2 text-gray-800">
+        {user.email}
+      </div>
+    </div>
+
+    <div>
+      <label className="block text-sm font-medium text-gray-600 mb-1">Date d'inscription</label>
+      <div className="bg-gray-100 rounded-md px-3 py-2 text-gray-800">
+        {new Date(user.created_at).toLocaleDateString('fr-FR')}
+      </div>
+    </div>
+  </div>
+</div>
       </div>
     </div>
   )
