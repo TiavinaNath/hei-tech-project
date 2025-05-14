@@ -104,30 +104,8 @@ export async function registerProvider(data: Record<string, any>) {
             throw new Error('Erreur base de données: insertion utilisateur')
         }
 
-        // 3. Upload image (optionnel)
-        const profilePhotoUrl = "https://drive.google.com/uc?export=view&id=1hLyOK4QMInOTvRcsHGBCaLgOt1LLHvK9";
-        // let profilePhotoUrl: string | null = null
-        // if (data.profile_picture && data.profile_picture instanceof File) {
-        //     const file = data.profile_picture
-        //     const filename = `${userId}/${uuidv4()}-${file.name}`
-
-        //     const { data: uploadData, error: uploadError } = await supabase.storage
-        //         .from('provider-profile-pictures')
-        //         .upload(filename, file, {
-        //             contentType: file.type
-        //         })
-
-        //     if (uploadError) {
-        //         console.error('Erreur upload photo:', uploadError)
-        //         throw new Error('Échec du téléversement de la photo de profil.')
-        //     }
-
-        //     const { data: publicUrlData } = supabase.storage
-        //         .from('provider-profile-pictures')
-        //         .getPublicUrl(uploadData.path)
-
-        //     profilePhotoUrl = publicUrlData.publicUrl
-        // }
+        // 3. Upload image (via Cloudinary)
+        const profilePhotoUrl = data.profile_photo_url || "https://drive.google.com/uc?export=view&id=13pHO8MFCghimlzT2vIY8U1FL7wJEWpn5";
 
         // 3.5 Géocodage adresse (si fournie)
         let fixed_location = null
