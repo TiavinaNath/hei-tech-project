@@ -35,10 +35,11 @@ export default function NavbarClient() {
 
   return (
     <nav className="relative flex items-center justify-between px-6 py-2 shadow-sm bg-white">
-      <div className="flex items-center">
-        <Image src="/yoojo-logo.png" alt="Yoojo logo" width={80} height={30} />
-      </div>
-
+<Link href="/">
+  <div className="flex items-center cursor-pointer">
+    <Image src="/yoojo-logo.png" alt="Yoojo logo" width={80} height={30} />
+  </div>
+</Link>
       <button className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-4 py-2 rounded-full transition-all">
         <span className="text-xl">➕</span>
         Demander un service

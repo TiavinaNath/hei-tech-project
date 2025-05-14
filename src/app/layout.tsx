@@ -1,7 +1,7 @@
 import { createServerComponentClient } from '@supabase/auth-helpers-nextjs';
 import { cookies } from 'next/headers';
 import { ServicesProvider } from '../contexts/ServicesContext';
-import StaticNavbarWrapper from '@/components/features/accueil/StaticNavbarWrapper'
+import NavbarWrapper from '@/components/features/accueil/NavbarWrapper'
 import './globals.css';
 
 export const metadata = {
@@ -25,13 +25,12 @@ export default async function RootLayout({
 
   const services = data ?? [];
 
-  return (
+   return (
     <html lang="fr">
       <body>
         <ServicesProvider initialServices={services}>
-          <StaticNavbarWrapper>
-            {children}
-          </StaticNavbarWrapper>
+          <NavbarWrapper />
+          {children}
         </ServicesProvider>
       </body>
     </html>
