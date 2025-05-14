@@ -1,13 +1,16 @@
 "use client";
 import { SignUpUserFormData } from "@/lib/validators/user";
-import { UseFormRegister, FieldErrors, UseFormWatch } from "react-hook-form";
+import { UseFormRegister, FieldErrors, UseFormWatch, UseFormSetValue } from "react-hook-form";
 import Field from "@/type/field";
+import AddressAutocomplete from "../features/provider-address/AddressAutoCompletedField";
 
 interface FormStepProps {
   fields: Field[];
   register: UseFormRegister<SignUpUserFormData>;
   errors: FieldErrors<SignUpUserFormData>;
   watch?: UseFormWatch<SignUpUserFormData>;
+  setValue?: UseFormSetValue<SignUpUserFormData>;
+  onAddressSelect?: (lat: number, lon: number) => void;
 }
 
 export default function FormStep({
@@ -15,6 +18,8 @@ export default function FormStep({
   register,
   errors,
   watch,
+  setValue,
+  onAddressSelect,
 }: FormStepProps) {
   return (
     <div className="space-y-4">
@@ -29,7 +34,8 @@ export default function FormStep({
 
         return (
           <div key={field.id}>
-            {field.type !== "checkbox" && (
+            {/* Ne pas afficher le label pour les checkbox et address-autocomplete */}
+            {field.type !== "checkbox" && field.type !== "address-autocomplete" && (
               <label
                 htmlFor={field.id}
                 className="mb-1 block text-sm font-medium text-gray-700"
@@ -68,10 +74,8 @@ export default function FormStep({
                 type="file"
                 accept="image/*"
                 onChange={(e) => {
-                  console.log(e.target.files?.[0])
                   const file = e.target.files?.[0];
                   if (file) {
-                    // Manuellement injecter le fichier dans formData
                     (window as any).selectedFiles = {
                       ...(window as any).selectedFiles,
                       [field.id]: file,
@@ -79,6 +83,25 @@ export default function FormStep({
                   }
                 }}
                 className="w-full rounded-lg border border-gray-200 px-4 py-2 focus:border-[#457bed] focus:outline-none focus:ring-2 focus:ring-[#457bed]/50"
+              />
+            ) : field.type === "address-autocomplete" ? (
+              <AddressAutocomplete
+                id={field.id}
+                value={watch ? watch(field.id as keyof SignUpUserFormData) || "" : ""}
+                onChange={(value) => {
+                  if (setValue) {
+                    setValue(field.id, value);
+                  }
+                }}
+                onSelect={(address, lat, lon) => {
+                  if (setValue) {
+                    setValue(field.id, address);
+                  }
+                  if (onAddressSelect) {
+                    onAddressSelect(lat, lon);
+                  }
+                }}
+                placeholder={field.placeholder}
               />
             ) : (
               <input

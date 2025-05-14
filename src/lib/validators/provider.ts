@@ -20,6 +20,10 @@ export const step2Schema = z.object({
 
 export const step3Schema = z.object({
     address: z.string().min(1, "Adresse requise"),
+    coordinates: z.object({
+        lat: z.number(),
+        lon: z.number(),
+    }).optional(),
     service_radius: z
         .string()
         .min(1, "Minimum 1 km")
