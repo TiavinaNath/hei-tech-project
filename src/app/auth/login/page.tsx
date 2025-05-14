@@ -2,7 +2,7 @@
 import { loginUser } from "@/app/actions/auth";
 import LoginForm from "@/components/ui/LoginFormUI";
 import WelcomeSection from "@/components/ui/WelcomeSection";
-import { LoginUserFormData } from "@/lib/validators/provider";
+import { LoginUserFormData } from "@/lib/validators/login";
 
 export default function LoginPage() {
   const handleSubmit = async (formData: LoginUserFormData) => {
