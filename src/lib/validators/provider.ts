@@ -24,6 +24,10 @@ export const step3Schema = z.object({
         lat: z.number(),
         lon: z.number(),
     }).optional(),
+    userLocation: z.object({
+        lat: z.number(),
+        lon: z.number(),
+    }).optional(),
     service_radius: z
         .string()
         .min(1, "Minimum 1 km")
@@ -33,6 +37,9 @@ export const step3Schema = z.object({
             message: "Obligatoire si vous êtes en déplacement",
             path: ["service_radius"],
         }),
+}).refine(data => data.address || data.userLocation, {
+    message: "Vous devez soit entrer une adresse, soit utiliser la géolocalisation",
+    path: ["address"]
 });
 
 export const step4Schema = z.object({
