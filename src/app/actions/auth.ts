@@ -57,7 +57,7 @@ export async function registerUser(data: Record<string, string>) {
         console.error('Erreur d\'inscription:', error)
         throw error
     }
-    redirect('/dashboard')
+    redirect('/auth/verify-email')
 }
 
 export async function registerProvider(data: Record<string, any>) {
@@ -163,7 +163,7 @@ export async function registerProvider(data: Record<string, any>) {
         console.error('Erreur d’inscription prestataire:', error)
         throw error
     }
-    redirect('/test')
+    redirect('/auth/verify-email')
 }
 
 

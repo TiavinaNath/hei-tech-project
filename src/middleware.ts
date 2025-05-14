@@ -7,7 +7,8 @@ const PUBLIC_ROUTES = [
     '/auth/login',
     '/auth/signup',
     '/auth/signup/client',
-    '/auth/signup/provider'
+    '/auth/signup/provider',
+    '/auth/verify-email'
 ]
 
 // Routes d'API publiques
