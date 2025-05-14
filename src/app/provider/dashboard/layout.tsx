@@ -1,4 +1,4 @@
-import DashboardSidebar from '@/components/ui/DashboardSidebarClient';
+import DashboardSidebar from '@/components/ui/DashboardSidebarProvider';
 
 export default function DashboardLayout ({
   children,
