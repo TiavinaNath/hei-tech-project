@@ -2,7 +2,7 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { loginUserSchema, LoginUserFormData } from "@/lib/validators/provider";
+import { loginUserSchema, LoginUserFormData } from "@/lib/validators/login";
 import { useState } from "react";
 
 interface LoginFormProps {
