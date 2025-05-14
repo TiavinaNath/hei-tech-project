@@ -108,12 +108,9 @@ export async function registerProvider(data: Record<string, any>) {
         const profilePhotoUrl = data.profile_photo_url || "https://drive.google.com/uc?export=view&id=13pHO8MFCghimlzT2vIY8U1FL7wJEWpn5";
 
         // 3.5 Géocodage adresse (si fournie)
-        let fixed_location = null
-        if (data.address) {
-            const geo = await geocodeAddress(data.address)
-            if (geo) {
-                fixed_location = `POINT(${geo.lon} ${geo.lat})`
-            }
+        let fixed_location = null;
+        if (data.address && data.coordinates) {
+            fixed_location = `POINT(${data.coordinates.lon} ${data.coordinates.lat})`;
         }
 
         // 4. Insertion dans `provider_profiles`
