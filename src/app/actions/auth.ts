@@ -189,7 +189,7 @@ export async function loginUser(credentials: { email: string, password: string }
         console.error("Erreur dans loginUser:", error)
         throw error
     }
-    redirect('/dashboard')
+    redirect('/client/dashboard')
 }
 
 function uuidv4() {

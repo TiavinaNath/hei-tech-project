@@ -31,7 +31,7 @@ export default function AddressPage() {
       address: item.display_name,
       coordinates: { lat: parseFloat(item.lat), lon: parseFloat(item.lon) },
     });
-    router.push('/request/phone');
+    router.push('/client/request/phone');
   };
 
   return (
