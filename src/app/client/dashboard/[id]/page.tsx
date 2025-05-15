@@ -69,7 +69,7 @@ export default function RequestDetailsPage() {
   if (!request) return <p>Demande introuvable.</p>
 
   return (
-    <div className="p-6" style={{border: '1px solid red'}}>
+    <div className="p-6">
       <RequestHeader request={request} />
       <OffersList offers={request.offers} />
     </div>

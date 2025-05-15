@@ -7,32 +7,24 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
 
   const links = [
-    { href: '/client/dashboard', label: 'Mes demandes', icon: '🔖' },
-    { href: '/client/dashboard/messages', label: 'Messagerie', icon: '💬' },
-    { href: '/client/dashboard/account', label: 'Compte', icon: '👤' },
+    { href: '/client/dashboard', label: 'Mes demandes' },
+    { href: '/client/dashboard/messages', label: 'Messagerie' },
+    { href: '/client/dashboard/account', label: 'Compte' },
   ];
 
   return (
-    <nav style={{ width: 200, padding: '1rem', background: '#f9f9f9' }}>
-      {links.map(link => (
+    <nav className="w-52 h-screen p-4 bg-[#f9f9f9] fixed top-16 left-0 overflow-y-auto">
+      {links.map(({ href, label }) => (
         <Link
-          key={link.href}
-          href={link.href}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '0.5rem',
-            padding: '0.75rem',
-            marginBottom: '0.5rem',
-            borderRadius: '8px',
-            background: pathname === link.href ? '#f1f1f1' : 'transparent',
-            fontWeight: pathname === link.href ? 'bold' : 'normal',
-            color: pathname === link.href ? 'black' : '#666',
-            textDecoration: 'none',
-          }}
+          key={href}
+          href={href}
+          className={`flex items-center gap-2 px-3 py-2 mb-2 rounded-md text-sm no-underline ${
+            pathname === href
+              ? 'bg-[#f1f1f1] font-bold text-black'
+              : 'text-gray-600 hover:bg-gray-100'
+          }`}
         >
-          <span style={{ fontSize: '1.2rem' }}>{link.icon}</span>
-          {link.label}
+          {label}
         </Link>
       ))}
     </nav>
