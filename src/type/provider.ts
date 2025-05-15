@@ -5,11 +5,8 @@ export type Provider = {
   phone_number: string | null;
   birth_date: string | null;
   is_mobile: boolean;
-  travel_radius_km: number | null;
-  fixed_location: {
-    latitude: number;
-    longitude: number;
-  } | null;
+  travel_radius_km: number;
+  fixed_location: string| null;
   bio: string;
 
   user: {

@@ -131,7 +131,7 @@ export default function ProviderInfo({ provider }: { provider: Provider }) {
       </section>
 
       {/* Section Localisation */}
-      <LocationSection fixed_location={provider.fixed_location} />
+      <LocationSection fixed_location={provider.fixed_location} travel_radius_km={provider.travel_radius_km} />
     </div>
   );
 }

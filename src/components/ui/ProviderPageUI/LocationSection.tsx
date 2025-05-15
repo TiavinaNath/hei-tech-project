@@ -1,41 +1,43 @@
+'use client';
+
+import dynamic from 'next/dynamic';
+import { parseWKBToLatLngBrowser } from '@/lib/utils/geo';
+import type { LatLngExpression } from 'leaflet';
+
+const LeafletMap = dynamic(() => import('@/components/features/provider-address/LeafletMap'), {
+  ssr: false,
+});
+
 type LocationSectionProps = {
-  fixed_location: { latitude: number; longitude: number } | null;
+  fixed_location: string | null;
+  travel_radius_km: number;
 };
 
 export default function LocationSection({
   fixed_location,
+  travel_radius_km,
 }: LocationSectionProps) {
-  const lat = fixed_location?.latitude ?? -18.8692; // fallback Antananarivo
-  const lng = fixed_location?.longitude ?? 47.522;
+  const location = fixed_location
+    ? parseWKBToLatLngBrowser(fixed_location)
+    : null;
 
-  const bbox = `${lng - 0.016},${lat - 0.01},${lng + 0.016},${lat + 0.01}`;
-  const marker = `${lat},${lng}`;
-  const mapUrl = `https://www.openstreetmap.org/export/embed.html?bbox=${bbox}&layer=mapnik&marker=${marker}`;
+  const lat = location?.latitude ?? -18.8692;
+  const lng = location?.longitude ?? 47.522;
+  const center: LatLngExpression = [lat, lng];
 
   return (
-    <section>
-      <h2 className="text-2xl font-semibold text-[#457bed] mb-4">
-        Localisation
-      </h2>
-      <div className="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
-        <div className="h-64 bg-gray-100 rounded-lg mb-4 relative overflow-hidden">
-          <iframe
-            width="100%"
-            height="100%"
-            frameBorder="0"
-            scrolling="no"
-            marginHeight={0}
-            marginWidth={0}
-            src={mapUrl}
-            className="absolute inset-0"
-          />
-        </div>
-        <p className="text-gray-700">
-          <strong>Adresse:</strong> {lat.toFixed(4)}, {lng.toFixed(4)}
-        </p>
-        <p className="text-gray-500 text-sm mt-2">
+    <section className="mb-8">
+      <h2 className="text-2xl font-semibold text-[#457bed] mb-4">Localisation</h2>
+
+      <p className="text-gray-700 mb-2">
+        <strong>Adresse:</strong> {lat.toFixed(4)}, {lng.toFixed(4)} <br />
+        <span className="text-sm text-gray-500 italic">
           (Adresse exacte disponible après réservation)
-        </p>
+        </span>
+      </p>
+
+      <div className="h-72 w-full rounded-lg overflow-hidden">
+        <LeafletMap center={center} radius={travel_radius_km * 1000} />
       </div>
     </section>
   );
