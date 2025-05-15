@@ -9,8 +9,14 @@ export function groupProviders(data: any[]) {
         if (!grouped[providerId]) {
             grouped[providerId] = {
                 id: providerId,
+                user_id: row.user_id,
                 profile_photo_url: row.profile_photo_url,
                 bio: row.bio,
+                phone_number: row.phone_number,
+                birth_date: row.birth_date,
+                is_mobile: row.is_mobile,
+                fixed_location: row.fixed_location,
+                travel_radius_km: row.travel_radius_km,
                 user: {
                     id: row.user_id,
                     first_name: row.first_name,
@@ -19,7 +25,7 @@ export function groupProviders(data: any[]) {
                 provider_services: [],
                 provider_engagements: [],
                 provider_equipments: [],
-                reviews: []
+                reviews: [],
             };
         }
 
