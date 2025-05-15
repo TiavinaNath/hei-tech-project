@@ -1,12 +1,36 @@
-"use client"
+"use client";
 import { registerProvider } from "@/app/actions/auth";
 import ProviderSignUpForm from "@/components/ui/ProviderSignUpForm";
 import WelcomeSection from "@/components/ui/WelcomeSection";
+import { uploadToCloudinary } from "@/lib/utils/uploadToCloudinary";
 
 export default function SignupPageProvider() {
   const handleSubmit = async (formData: Record<string, any>) => {
-    console.log("Données finales envoyées à Supabase :", formData);
-    await registerProvider(formData);
+    console.log("Données brutes du formulaire :", formData);
+
+    if (typeof window !== "undefined" && (window as any).selectedFiles) {
+      Object.entries((window as any).selectedFiles).forEach(([key, file]) => {
+        formData[key] = file;
+      });
+    }
+
+    try {
+      if (
+        formData.profile_picture &&
+        typeof window !== "undefined" &&
+        formData.profile_picture instanceof File
+      ) {
+        const uploadedUrl = await uploadToCloudinary(formData.profile_picture);
+        formData.profile_photo_url = uploadedUrl;
+      }
+
+      delete formData.profile_picture;
+
+      console.log("Données finales envoyées à Supabase :", formData);
+      await registerProvider(formData);
+    } catch (error) {
+      console.error("Erreur lors de l'inscription :", error);
+    }
   };
 
   return (
