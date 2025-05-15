@@ -1,16 +1,18 @@
-import DashboardSidebar from '@/components/ui/DashboardSidebarProvider';
+import DashboardSidebarProvider from '@/components/ui/DashboardSidebarProvider';
 
-export default function DashboardLayout ({
+export default function DashboardLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: React.ReactNode;
 }) {
   return (
-    <div style={{ display: 'flex' }}>
-      <DashboardSidebar />
-      <main style={{ flex: 1, padding: '2rem' }}>
-        {children}
-      </main>
+    <div className="h-screen flex flex-col">
+      <div className="flex flex-1">
+        <DashboardSidebarProvider />
+        <div className="ml-52 w-full p-8 overflow-y-auto">
+          {children}
+        </div>
+      </div>
     </div>
   );
 }
