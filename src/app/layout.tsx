@@ -3,6 +3,7 @@ import { cookies } from 'next/headers';
 import { ServicesProvider } from '../contexts/ServicesContext';
 import NavbarWrapper from '@/components/features/accueil/NavbarWrapper';
 import './globals.css';
+import 'leaflet/dist/leaflet.css';
 
 export const metadata = {
   title: 'HEI Tech',
