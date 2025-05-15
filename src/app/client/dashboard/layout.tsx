@@ -1,4 +1,4 @@
-import DashboardSidebar from '@/components/ui/DashboardSidebarClient';
+import DashboardSidebarClient from '@/components/ui/DashboardSidebarClient';
 
 export default function DashboardLayout({
   children,
@@ -6,12 +6,12 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', flex: 1 }}>
-        <DashboardSidebar />
-        <main style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+    <div className="h-screen flex flex-col">
+      <div className="flex flex-1">
+        <DashboardSidebarClient />
+        <div className="ml-52 w-full p-8 overflow-y-auto">
           {children}
-        </main>
+        </div>
       </div>
     </div>
   );
