@@ -35,5 +35,3 @@ export default function ProviderProfile({ profile }: { profile: any }) {
     </div>
   )
 }
-
-
