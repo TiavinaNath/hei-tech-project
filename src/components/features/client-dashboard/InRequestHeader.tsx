@@ -1,5 +1,6 @@
 import { format } from 'date-fns'
 import { MapPin, CalendarDays } from 'lucide-react'
+import { fr } from 'date-fns/locale'
 import styles from '@/app/style/InrequestHeader.module.css'
 
 export default function InRequestHeader({ request }: { request: any }) {
@@ -34,7 +35,10 @@ export default function InRequestHeader({ request }: { request: any }) {
 										className="flex items-center gap-2"
 									/>
 								</div>
-								{format(new Date(request.preferred_date_time), 'EEEE dd MMMM yyyy à HH:mm')}
+								{format(new Date(request.preferred_date_time), "EEEE dd MMMM yyyy 'à' HH:mm", { locale: fr })
+									.charAt(0)
+									.toUpperCase() +
+									format(new Date(request.preferred_date_time), "EEEE dd MMMM yyyy 'à' HH:mm", { locale: fr }).slice(1)}
 							</div>
 
 							<div className={styles.serviceTag}>
