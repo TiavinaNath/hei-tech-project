@@ -1,10 +1,22 @@
 import styles from '@/app/style/OfferItem.module.css'
+import ContactButton from '@/components/features/offer/ContactButton'
 import ProviderProfile from '@/components/features/client-dashboard/ProviderProfile'
 import ProviderServices from '@/components/features/client-dashboard/ProviderServices'
 import ProviderEquipments from '@/components/features/client-dashboard/ProviderEquipments'
 import ProviderReviews from '@/components/features/client-dashboard/ProviderReviews'
 
-export default function OfferItem({ offer }: { offer: any }) {
+
+export default function OfferItem({
+  offer,
+  requestId,
+  clientId,
+  isClientView
+}: {
+  offer: any
+  requestId: string
+  clientId: string
+  isClientView: boolean
+}) {
   const user = offer.users
   const profile = user?.provider_profiles
 
@@ -56,7 +68,12 @@ export default function OfferItem({ offer }: { offer: any }) {
         )}
       </div>
         <div className={styles.buttonsGroup}>
-        <button>Contacter</button>
+        <ContactButton
+          requestId={requestId}
+          clientId={clientId}
+          providerId={user?.id}
+          isClientView={isClientView}
+        />
         <button>Accepter</button>
       </div>
     </li>
