@@ -58,7 +58,7 @@ export default function NavbarClient() {
         scrolled ? 'bg-white shadow-md' : 'bg-[#f9f9f9]'
       }`}
     >
-      <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
+      <div className="flex items-center justify-between py-3 max-w-7xl mx-auto">
         <Link href="/">
           <div className="flex items-center cursor-pointer">
             <Image src="/yoojo-logo.png" alt="Yoojo logo" width={80} height={30} />
