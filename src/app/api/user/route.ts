@@ -15,7 +15,7 @@ export async function GET() {
 
   const { data: profile, error } = await supabase
     .from('users')
-    .select('first_name')
+    .select('first_name, role')
     .eq('id', session.user.id)
     .single();
 
@@ -27,5 +27,6 @@ export async function GET() {
   return NextResponse.json({
     userId: session.user.id,
     firstName: profile.first_name,
+    role: profile.role,
   });
 }
