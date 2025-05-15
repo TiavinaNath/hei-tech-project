@@ -1,30 +1,65 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import NavbarClient from '@/components/ui/NavbarClient'; // ton navbar connecté
-import Navbar from '@/components/ui/Navbar'; // ton navbar non connecté
+import { supabase } from '@/lib/supabaseClient';
+import NavbarClient from '@/components/ui/NavbarClient';
+import NavbarProvider from '@/components/ui/NavbarProvider';
+import Navbar from '@/components/ui/Navbar';
+
+type Role = 'CLIENT' | 'PROVIDER' | null;
 
 export default function NavbarWrapper() {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [role, setRole] = useState<Role>(null);
+  const [loading, setLoading] = useState(true);
 
+  const fetchUserRole = async () => {
+    try {
+      const res = await fetch('/api/user');
+      if (!res.ok) throw new Error('Non authentifié');
+
+      const user = await res.json();
+      if (user.role === 'CLIENT') setRole('CLIENT');
+      else if (user.role === 'PROVIDER') setRole('PROVIDER');
+    } catch (error) {
+      setRole(null);
+      console.error('Error fetching user role:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Vérifie la session initiale
   useEffect(() => {
     const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/user');
-        setIsAuthenticated(res.ok); // 200 = connecté, 401 = non
-      } catch (err) {
-        console.error('Erreur auth:', err);
-        setIsAuthenticated(false);
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        fetchUserRole();
+      } else {
+        setRole(null);
+        setLoading(false);
       }
     };
 
     checkAuth();
   }, []);
 
-  if (isAuthenticated === null) {
-    return null; // ou un loader si tu veux
-  }
+  // Met à jour lors des changements de session
+  useEffect(() => {
+    const { data: subscription } = supabase.auth.onAuthStateChange((_event, session) => {
+      if (session?.user) {
+        fetchUserRole();
+      } else {
+        setRole(null);
+        setLoading(false);
+      }
+    });
 
-  return isAuthenticated ? <NavbarClient /> : <Navbar />;
+    return () => subscription.subscription.unsubscribe();
+  }, []);
+
+  if (loading) return null; // ou un spinner
+
+  if (role === 'CLIENT') return <NavbarClient />;
+  if (role === 'PROVIDER') return <NavbarProvider />;
+  return <Navbar />;
 }
-
