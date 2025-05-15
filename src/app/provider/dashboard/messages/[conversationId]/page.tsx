@@ -102,11 +102,25 @@ export default function ConversationPage() {
     }
   };
 
- const handleRespondToProposal = async (accept: boolean) => {
+const handleRespondToProposal = async (accept: boolean) => {
   if (!proposal) return;
   const status = accept ? 'ACCEPTED' : 'REJECTED';
 
-  // Met à jour la proposition
+  // Récupérer la conversation pour obtenir la request_id
+  const { data: convData, error: convError } = await supabase
+    .from('conversations')
+    .select('request_id')
+    .eq('id', conversationId)
+    .maybeSingle();
+
+  if (convError || !convData?.request_id) {
+    console.error('Erreur récupération request_id depuis conversation', convError);
+    return;
+  }
+
+  const requestId = convData.request_id;
+
+  // Mise à jour de la proposition
   const { error: proposalError } = await supabase
     .from('final_price_proposals')
     .update({ status })
@@ -118,36 +132,75 @@ export default function ConversationPage() {
   }
 
   if (accept) {
-    // 🔁 Corrigé : récupérer la demande via conversations
-    const { data: convData, error: convError } = await supabase
-      .from('conversations')
-      .select('request_id')
-      .eq('id', conversationId)
-      .maybeSingle();
-
-    if (convError || !convData?.request_id) {
-      console.error('Erreur récupération request_id depuis conversation', convError);
-      return;
-    }
-
-    // Mise à jour de la demande client
-    const { error: updateError } = await supabase
+    // 1. Mettre à jour la demande client (en IN_PROGRESS + infos d’accord)
+    const { error: updateRequestError } = await supabase
       .from('client_requests')
       .update({
+        status: 'IN_PROGRESS',
         agreed_price: proposal.price,
         agreed_notes: proposal.note,
         agreed_at: new Date().toISOString(),
       })
-      .eq('id', convData.request_id);
+      .eq('id', requestId);
 
-    if (updateError) {
-      console.error('Erreur mise à jour demande client', updateError);
+    if (updateRequestError) {
+      console.error('Erreur mise à jour de la demande client', updateRequestError);
+      return;
+    }
+
+    // 2. Rejeter toutes les autres propositions
+    const { error: rejectOthersError } = await supabase
+      .from('final_price_proposals')
+      .update({ status: 'REJECTED' })
+      .eq('conversation_id', conversationId)
+      .neq('id', proposal.id);
+
+    if (rejectOthersError) {
+      console.error('Erreur rejet autres propositions', rejectOthersError);
       return;
     }
   }
 
   await fetchLatestProposal(); // refresh l’état local
 };
+
+//realtime
+useEffect(() => {
+  if (!conversationId) return;
+
+  const channel = supabase
+    .channel(`proposal-${conversationId}`)
+    .on(
+      'postgres_changes',
+      {
+        event: 'INSERT',
+        schema: 'public',
+        table: 'final_price_proposals',
+        filter: `conversation_id=eq.${conversationId}`,
+      },
+      () => {
+        fetchLatestProposal(); // recharge la proposition si une nouvelle arrive
+      }
+    )
+    .on(
+      'postgres_changes',
+      {
+        event: 'UPDATE',
+        schema: 'public',
+        table: 'final_price_proposals',
+        filter: `conversation_id=eq.${conversationId}`,
+      },
+      () => {
+        fetchLatestProposal(); // recharge si une proposition est mise à jour (acceptée ou rejetée)
+      }
+    )
+    .subscribe();
+
+  return () => {
+    supabase.removeChannel(channel);
+  };
+}, [conversationId]);
+
 
   return (
     <div className="p-4 max-w-3xl mx-auto">
