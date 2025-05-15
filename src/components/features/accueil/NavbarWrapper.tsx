@@ -1,20 +1,22 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import NavbarClient from '@/components/ui/NavbarClient'; // ton navbar connecté
-import Navbar from '@/components/ui/Navbar'; // ton navbar non connecté
+import { supabase } from '@/lib/supabaseClient';
+import NavbarClient from '@/components/ui/NavbarClient';
+import Navbar from '@/components/ui/Navbar';
 
 export default function NavbarWrapper() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
   useEffect(() => {
     const checkAuth = async () => {
-      try {
-        const res = await fetch('/api/user');
-        setIsAuthenticated(res.ok); // 200 = connecté, 401 = non
-      } catch (err) {
-        console.error('Erreur auth:', err);
+      const { data: { session }, error } = await supabase.auth.getSession();
+
+      if (error) {
+        console.error('Erreur de session:', error);
         setIsAuthenticated(false);
+      } else {
+        setIsAuthenticated(!!session?.user);
       }
     };
 
@@ -22,9 +24,11 @@ export default function NavbarWrapper() {
   }, []);
 
   if (isAuthenticated === null) {
-    return null; // ou un loader si tu veux
+    return null;
   }
+
+  console.log(isAuthenticated);
+  
 
   return isAuthenticated ? <NavbarClient /> : <Navbar />;
 }
-
