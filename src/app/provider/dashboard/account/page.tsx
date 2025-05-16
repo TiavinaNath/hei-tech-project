@@ -49,7 +49,7 @@ export default async function ProviderAccountPage() {
     <div className="min-h-screen bg-gray-50">
       <div className="flex flex-col lg:flex-row">
         <div className="w-full lg:w-1/3">
-          <ProviderProfile provider={provider}/>
+          <ProviderProfile provider={provider} modification={true}/>
         </div>
         <div className="w-full lg:w-2/3">
           <ProviderInfo provider={provider} />
