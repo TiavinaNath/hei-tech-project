@@ -29,6 +29,37 @@ export default function ConversationPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [proposal, setProposal] = useState<Proposal | null>(null);
   const messagesEndRef = useRef<HTMLDivElement | null>(null);
+  const [requestStatus, setRequestStatus] = useState<string | null>(null);
+
+  const fetchRequestStatus = async () => {
+  const { data: convData, error: convError } = await supabase
+    .from('conversations')
+    .select('request_id')
+    .eq('id', conversationId)
+    .maybeSingle();
+
+  if (convError || !convData?.request_id) {
+    console.error('Erreur récupération request_id', convError);
+    return;
+  }
+
+  const requestId = convData.request_id;
+
+  const { data: requestData, error: requestError } = await supabase
+    .from('client_requests')
+    .select('status')
+    .eq('id', requestId)
+    .maybeSingle();
+
+  if (requestError) {
+    console.error('Erreur récupération status de la demande', requestError);
+    return;
+  }
+
+  setRequestStatus(requestData?.status ?? null);
+};
+
+
 
   useEffect(() => {
     const getSession = async () => {
@@ -42,6 +73,7 @@ export default function ConversationPage() {
     if (conversationId) {
       getMessagesByConversationId(conversationId).then(setMessages);
       fetchLatestProposal();
+      fetchRequestStatus();
     }
   }, [conversationId]);
 
@@ -95,169 +127,163 @@ export default function ConversationPage() {
       .limit(1)
       .maybeSingle();
 
-    if (error) {
-      console.error('Erreur récupération proposition', error);
-    } else {
-      setProposal(data);
-    }
+    if (error) console.error('Erreur récupération proposition', error);
+    else setProposal(data);
   };
 
-const handleRespondToProposal = async (accept: boolean) => {
-  if (!proposal) return;
-  const status = accept ? 'ACCEPTED' : 'REJECTED';
+  const handleRespondToProposal = async (accept: boolean) => {
+    if (!proposal) return;
+    const status = accept ? 'ACCEPTED' : 'REJECTED';
 
-  // Récupérer la conversation pour obtenir la request_id
-  const { data: convData, error: convError } = await supabase
-    .from('conversations')
-    .select('request_id')
-    .eq('id', conversationId)
-    .maybeSingle();
+    const { data: convData, error: convError } = await supabase
+      .from('conversations')
+      .select('request_id')
+      .eq('id', conversationId)
+      .maybeSingle();
 
-  if (convError || !convData?.request_id) {
-    console.error('Erreur récupération request_id depuis conversation', convError);
-    return;
-  }
-
-  const requestId = convData.request_id;
-
-  // Mise à jour de la proposition
-  const { error: proposalError } = await supabase
-    .from('final_price_proposals')
-    .update({ status })
-    .eq('id', proposal.id);
-
-  if (proposalError) {
-    console.error('Erreur mise à jour proposition', proposalError);
-    return;
-  }
-
-  if (accept) {
-    // 1. Mettre à jour la demande client (en IN_PROGRESS + infos d’accord)
-    const { error: updateRequestError } = await supabase
-      .from('client_requests')
-      .update({
-        status: 'IN_PROGRESS',
-        agreed_price: proposal.price,
-        agreed_notes: proposal.note,
-        agreed_at: new Date().toISOString(),
-      })
-      .eq('id', requestId);
-
-    if (updateRequestError) {
-      console.error('Erreur mise à jour de la demande client', updateRequestError);
+    if (convError || !convData?.request_id) {
+      console.error('Erreur récupération request_id depuis conversation', convError);
       return;
     }
 
-    // 2. Rejeter toutes les autres propositions
-    const { error: rejectOthersError } = await supabase
+    const requestId = convData.request_id;
+
+    const { error: proposalError } = await supabase
       .from('final_price_proposals')
-      .update({ status: 'REJECTED' })
-      .eq('conversation_id', conversationId)
-      .neq('id', proposal.id);
+      .update({ status })
+      .eq('id', proposal.id);
 
-    if (rejectOthersError) {
-      console.error('Erreur rejet autres propositions', rejectOthersError);
+    if (proposalError) {
+      console.error('Erreur mise à jour proposition', proposalError);
       return;
     }
-  }
 
-  await fetchLatestProposal(); // refresh l’état local
-};
+    if (accept) {
+      const { error: updateRequestError } = await supabase
+        .from('client_requests')
+        .update({
+          status: 'IN_PROGRESS',
+          agreed_price: proposal.price,
+          agreed_notes: proposal.note,
+          agreed_at: new Date().toISOString(),
+        })
+        .eq('id', requestId);
 
-//realtime
-useEffect(() => {
-  if (!conversationId) return;
-
-  const channel = supabase
-    .channel(`proposal-${conversationId}`)
-    .on(
-      'postgres_changes',
-      {
-        event: 'INSERT',
-        schema: 'public',
-        table: 'final_price_proposals',
-        filter: `conversation_id=eq.${conversationId}`,
-      },
-      () => {
-        fetchLatestProposal(); // recharge la proposition si une nouvelle arrive
+      if (updateRequestError) {
+        console.error('Erreur mise à jour de la demande client', updateRequestError);
+        return;
       }
-    )
-    .on(
-      'postgres_changes',
-      {
-        event: 'UPDATE',
-        schema: 'public',
-        table: 'final_price_proposals',
-        filter: `conversation_id=eq.${conversationId}`,
-      },
-      () => {
-        fetchLatestProposal(); // recharge si une proposition est mise à jour (acceptée ou rejetée)
-      }
-    )
-    .subscribe();
 
-  return () => {
-    supabase.removeChannel(channel);
+      const { error: rejectOthersError } = await supabase
+        .from('final_price_proposals')
+        .update({ status: 'REJECTED' })
+        .eq('conversation_id', conversationId)
+        .neq('id', proposal.id);
+
+      if (rejectOthersError) {
+        console.error('Erreur rejet autres propositions', rejectOthersError);
+        return;
+      }
+    }
+
+    await fetchLatestProposal();
   };
-}, [conversationId]);
 
+  useEffect(() => {
+    if (!conversationId) return;
+
+    const channel = supabase
+      .channel(`proposal-${conversationId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'final_price_proposals',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        fetchLatestProposal
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'final_price_proposals',
+          filter: `conversation_id=eq.${conversationId}`,
+        },
+        fetchLatestProposal
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [conversationId]);
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      {/* Zone de messages */}
-      <div className="h-[400px] overflow-y-scroll border rounded p-2 mb-4 bg-white shadow">
+    <div className="max-w-4xl mx-auto px-4 py-6">
+      {/* Messages */}
+      <div className="bg-white border rounded-xl shadow-md h-[400px] overflow-y-auto p-4 space-y-2 mb-6">
         {messages.map((msg) => (
           <div
             key={msg.id}
-            className={`mb-2 ${msg.sender_id === userId ? 'text-right' : 'text-left'}`}
+            className={`flex ${msg.sender_id === userId ? 'justify-end' : 'justify-start'}`}
           >
-            <p
-              className={`inline-block px-3 py-2 rounded ${
-                msg.sender_id === userId ? 'bg-blue-100' : 'bg-gray-100'
+            <div
+              className={`px-4 py-2 rounded-2xl max-w-xs text-sm ${
+                msg.sender_id === userId
+                  ? 'bg-blue-600 text-white rounded-br-none'
+                  : 'bg-gray-100 text-gray-800 rounded-bl-none'
               }`}
             >
               {msg.content}
-            </p>
+            </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
       {/* Zone d’envoi */}
-      <div className="flex gap-2 mb-6">
+
+      {requestStatus !== 'COMPLETED' && (
+          <div className="flex gap-2">
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
-          placeholder="Écrire un message..."
-          className="flex-1 border px-3 py-2 rounded"
+          placeholder="Écrivez votre message..."
+          className="flex-1 border border-gray-300 rounded-xl px-4 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
         <button
           onClick={handleSend}
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="bg-blue-600 text-white px-5 py-2 rounded-xl hover:bg-blue-700 transition"
         >
           Envoyer
         </button>
       </div>
+      )
+      }
+    
 
       {/* Proposition d’accord */}
       {proposal && (
-        <div className="border-t pt-4 mt-4">
-          <h3 className="text-lg font-semibold mb-2">Proposition d’accord</h3>
-          <p><strong>Prix :</strong> {proposal.price} €</p>
-          {proposal.note && <p><strong>Note :</strong> {proposal.note}</p>}
-          <p><strong>Status :</strong> {proposal.status}</p>
+        <div className="mt-8 p-6 bg-gray-50 border rounded-xl shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-800 mb-4">Proposition d’accord</h3>
+          <p className="mb-1"><strong>Prix :</strong> {proposal.price} €</p>
+          {proposal.note && <p className="mb-1"><strong>Note :</strong> {proposal.note}</p>}
+          <p className="mb-2"><strong>Status :</strong> {proposal.status}</p>
 
           {proposal.status === 'PENDING' && (
-            <div className="mt-4 flex gap-4">
+            <div className="flex gap-4 mt-4">
               <button
                 onClick={() => handleRespondToProposal(true)}
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700"
               >
                 Accepter
               </button>
               <button
                 onClick={() => handleRespondToProposal(false)}
-                className="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600"
+                className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
               >
                 Refuser
               </button>
