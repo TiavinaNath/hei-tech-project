@@ -4,6 +4,7 @@ import ProviderProfile from '@/components/features/client-dashboard/ProviderProf
 import ProviderServices from '@/components/features/client-dashboard/ProviderServices'
 import ProviderEquipments from '@/components/features/client-dashboard/ProviderEquipments'
 import ProviderReviews from '@/components/features/client-dashboard/ProviderReviews'
+import Link from 'next/link'
 
 
 export default function OfferItem({
@@ -35,7 +36,13 @@ export default function OfferItem({
             )}
           </div>
           <div>
-            <p className={styles.userName}>{user?.first_name ?? 'Nom inconnu'}</p>
+           
+          <Link
+  href={`/provider/${profile?.id}`}
+  className="text-gray-800 hover:text-[#457bed] transition-colors duration-200 font-medium"
+>
+  {user?.first_name ?? 'Nom inconnu'}
+</Link>
             <div className="flex items-center gap-1 text-yellow-500 text-sm">
               {user?.provider_review_counts_by_service?.length > 0 && (
                 <ProviderReviews reviews={user.provider_review_counts_by_service} />
