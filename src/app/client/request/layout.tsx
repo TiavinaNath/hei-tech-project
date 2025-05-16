@@ -94,24 +94,41 @@ function StepLayout({ children }: { children: ReactNode }) {
     alert("Une erreur est survenue !");
   } else {
     console.log('Demande postée :', insertedRequest);
-    // Redirige vers la page de succès
-    //router.push('/request/success');
+    router.push('/client/dashboard');
   }
 }
   };
 
   return (
-    <div className="min-h-screen flex flex-col justify-between">
-      <main className="flex-1 p-6">{children}</main>
+<div className="min-h-screen flex flex-col justify-between bg-gray-50">
+  <main className="flex-1 p-6">{children}</main>
 
-      <footer className="flex justify-between items-center p-4 border-t bg-white">
-        <Button variant="outline" onClick={handlePrevious} disabled={currentStepIndex === 0}>
-          Précédent
-        </Button>
-        <Button onClick={handleNext} disabled={!canProceed}>
-          {isLastStep ? 'Poster la demande' : 'Continuer'}
-        </Button>
-      </footer>
-    </div>
+  <footer className="flex justify-between items-center p-4 border-t bg-white shadow-inner">
+    <button
+      onClick={handlePrevious}
+      disabled={currentStepIndex === 0}
+      className={`px-4 py-2 rounded-xl border transition duration-200 ${
+        currentStepIndex === 0
+          ? 'border-gray-300 text-gray-400 bg-gray-100 cursor-not-allowed'
+          : 'border-blue-300 text-blue-600 hover:bg-blue-50'
+      }`}
+    >
+      Précédent
+    </button>
+
+    <button
+      onClick={handleNext}
+      disabled={!canProceed}
+      className={`px-4 py-2 rounded-xl transition duration-200 font-medium ${
+        canProceed
+          ? 'bg-blue-600 text-white hover:bg-blue-700'
+          : 'bg-blue-200 text-white cursor-not-allowed'
+      }`}
+    >
+      {isLastStep ? 'Poster la demande' : 'Continuer'}
+    </button>
+  </footer>
+</div>
+
   );
 }
