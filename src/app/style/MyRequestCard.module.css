@@ -35,7 +35,7 @@
 }
 
 .button {
-  background-color: #00c4cc;
+  background-color: #457bed;
   color: white;
   padding: 0.7rem 1.5rem;
   border-radius: 999px;
@@ -47,5 +47,5 @@
 }
 
 .button:hover {
-  background-color: #01a8b0;
+  background-color: #457bed;
 }
