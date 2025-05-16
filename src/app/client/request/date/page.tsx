@@ -16,9 +16,20 @@ export default function DatePage() {
   };
 
   return (
-    <div className="flex flex-col items-center gap-4">
-      <h2 className="text-xl font-semibold">Choisissez une date</h2>
-      <Calendar mode="single" selected={selectedDate} onSelect={handleSelect} />
+  <div className="flex justify-center">
+  <div className="flex flex-col items-center gap-5 bg-white rounded-xl p-6 shadow-lg border border-blue-100 w-auto">
+    <h2 className="text-2xl font-bold text-[#457bed]">Choisissez une date</h2>
+
+    <div>
+      <Calendar
+        mode="single"
+        selected={selectedDate}
+        onSelect={handleSelect}
+        className="rounded-lg border border-blue-200 shadow-sm p-4"
+      />
     </div>
+  </div>
+</div>
+
   );
 }
