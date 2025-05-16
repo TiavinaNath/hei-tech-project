@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '@/lib/supabase/client'
 import { format } from 'date-fns'
+import { fr } from 'date-fns/locale'
 import styles from '@/app/style/MyRequestCard.module.css'
 import { useRouter } from 'next/navigation'
 
@@ -87,10 +88,10 @@ export default function MyRequestPage() {
             </p>
             <p className={styles.details}>
               {req.preferred_date_time
-                ? `${format(
-                    new Date(req.preferred_date_time),
-                    'EEEE, MMMM dd, yyyy'
-                  )} à ${format(new Date(req.preferred_date_time), 'HH:mm')}`
+                ? `${format(new Date(req.preferred_date_time), "EEEE dd MMMM yyyy 'à' HH:mm", { locale: fr })
+                                  .charAt(0)
+                                  .toUpperCase() +
+                                  format(new Date(req.preferred_date_time), "EEEE dd MMMM yyyy 'à' HH:mm", { locale: fr }).slice(1)}`
                 : 'Non spécifié'}
             </p>
             <p className="text-m line-clamp-2">{req.address_text}</p>

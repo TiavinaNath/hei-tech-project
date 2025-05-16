@@ -244,23 +244,25 @@
 }
 
 .buttonsGroup button:first-child {
-  background-color: #3b82f6; /* bleu */
-  color: white;
+  background-color: #e5e7eb; /* bleu */
+  color: #457bed;
 }
 
 .buttonsGroup button:first-child:hover {
   background-color: #2563eb;
   transform: translateY(-2px);
+  color: white;
 }
 
 .buttonsGroup button:last-child {
-  background-color: #10b981; /* vert */
-  color: white;
+  background-color: #e5e7eb; /* bleu */
+  color: #457bed;
 }
 
 .buttonsGroup button:last-child:hover {
   background-color: #059669;
   transform: translateY(-2px);
+  color: white;
 }
 
 

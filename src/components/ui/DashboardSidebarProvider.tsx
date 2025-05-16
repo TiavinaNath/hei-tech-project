@@ -7,7 +7,7 @@ export default function DashboardSidebar() {
   const pathname = usePathname();
 
   const links = [
-    { href: '/provider/dashboard', label: 'Mes demandes' },
+    { href: '/provider/dashboard', label: 'Les demandes' },
     { href: '/provider/dashboard/messages', label: 'Messagerie' },
     { href: '/provider/dashboard/account', label: 'Compte' },
   ];

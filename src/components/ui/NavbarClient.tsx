@@ -63,14 +63,14 @@ export default function NavbarClient() {
             scrolled ? 'bg-white shadow-md' : 'bg-[#f9f9f9]'
           }`}
         >
-          <div className="flex items-center justify-between px-6 py-3 max-w-7xl mx-auto">
+          <div className="flex items-center justify-between py-3 max-w-7xl mx-auto">
             <Link href="/">
               <div className="flex items-center cursor-pointer">
                 <Image src="/yoojo-logo.png" alt="Yoojo logo" width={80} height={30} />
               </div>
             </Link>
 
-            <button onClick={() => setIsModalOpen(true)}  className="hidden md:inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2 rounded-full transition-all duration-200 shadow-md">
+            <button onClick={() => setIsModalOpen(true)}  className="hidden md:inline-flex items-center gap-2 bg-[#457bed] hover:bg-blue-300 text-white font-semibold px-5 py-2 rounded-full transition-all duration-200 shadow-md">
               Demander un service
             </button>
 
@@ -81,7 +81,7 @@ export default function NavbarClient() {
               aria-haspopup="true"
               aria-expanded={menuOpen}
             >
-              <div className="bg-blue-600 text-white rounded-full w-9 h-9 flex items-center justify-center font-bold text-sm shadow">
+              <div className="bg-[#457bed] text-white rounded-full w-9 h-9 flex items-center justify-center font-bold text-sm shadow">
                 {firstName?.[0]?.toUpperCase() || '?'}
               </div>
               <h1 className="font-medium text-gray-800 text-sm select-none">
