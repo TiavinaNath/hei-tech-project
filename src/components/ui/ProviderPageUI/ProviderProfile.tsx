@@ -1,14 +1,40 @@
-type Provider = {
-  user: {
-    first_name: string;
-    last_name: string;
-  };
-  profile_photo_url: string;
-  provider_services: any[];
-  reviews: any[];
+"use client";
+import { useState } from "react";
+import { Provider } from "@/type/provider";
+
+type Category = {
+  id: string;
+  name: string;
 };
 
-export default function ProviderProfile({ provider }: { provider: Provider }) {
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+const categories: Category[] = [
+  { id: "72e77b75-e886-4f3f-b8fa-8579dafe01b2", name: "Cours" },
+  { id: "7e27e6b3-5445-48c6-bfaa-28acb03491a3", name: "Esthtétique" },
+  { id: "c5dac7b5-0f77-4502-bfee-1553c4a541dd", name: "Autres" },
+  { id: "eab4ae7b-04c6-41e7-bda1-93ef51683cfc", name: "Mécanicien" },
+  { id: "eb0f2e2d-806d-46c9-bffa-9e680047021c", name: "Couture" },
+  { id: "00f852ec-d2f5-44c2-834a-e47ebf9539f1", name: "Course" },
+  { id: "1a830618-292f-4fba-9c4b-f63584db4b19", name: "Jardinage" },
+  { id: "21df1b7f-cf22-40fd-ac79-baa01378f4cc", name: "Transport" },
+  { id: "27ee83b5-a754-49aa-ba5a-8a5c5cd2fde4", name: "Bricolage" },
+  { id: "2e3e0c96-6e71-4083-9f31-1e245f251762", name: "Plomberie" },
+  { id: "31135e93-aaaa-4a3a-88a8-deafb8a49b85", name: "Réparation" },
+];
+
+export default function ProviderProfile({
+  provider,
+  modification = false,
+}: {
+  provider: Provider;
+  modification?: boolean;
+}) {
+  const [isEditing, setIsEditing] = useState(false);
+  const [selectedCategoryId, setSelectedCategoryId] = useState("");
+  const [experienceYears, setExperienceYears] = useState("");
+
   const averageRating =
     provider.reviews.length > 0
       ? (
@@ -19,9 +45,53 @@ export default function ProviderProfile({ provider }: { provider: Provider }) {
         ).toFixed(1)
       : "Pas encore évalué";
 
+  const handleEditClick = () => {
+    setIsEditing(true);
+    const currentCategory = provider.provider_services[0]?.service?.id || "";
+    setSelectedCategoryId(currentCategory);
+    setExperienceYears("");
+  };
+
+  const handleSave = async () => {
+    if (!selectedCategoryId || !experienceYears) {
+      alert("Veuillez remplir tous les champs.");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_SUPABASE_URL}/rest/v1/provider_services`,
+        {
+          method: "POST",
+          headers: {
+            apikey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+            Authorization: `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY}`,
+            "Content-Type": "application/json",
+            Prefer: "return=representation",
+          },
+          body: JSON.stringify({
+            provider_id: provider.id,
+            service_id: selectedCategoryId,
+            experience_years: Number(experienceYears),
+          }),
+        }
+      );
+
+      if (!res.ok) {
+        throw new Error("Échec de l'enregistrement");
+      }
+
+      const data = await res.json();
+      setIsEditing(false);
+    } catch (error) {
+      console.error("Erreur :", error);
+      alert("Une erreur est survenue lors de la sauvegarde.");
+    }
+  };
+
   return (
     <div className="lg:w-1/3 lg:fixed lg:h-screen lg:overflow-hidden bg-gray-100 flex flex-col items-center pt-12 px-6">
-      {/* Photo ronde avec bordure bleue */}
+      {/* Photo de profil */}
       <div className="relative w-64 h-64 mb-8 rounded-full overflow-hidden border-4 border-[#00c896] shadow-lg">
         <img
           src={provider.profile_photo_url || "/default-profile.jpg"}
@@ -36,12 +106,57 @@ export default function ProviderProfile({ provider }: { provider: Provider }) {
           {provider.user.first_name} {provider.user.last_name}
         </h2>
 
-        {provider.provider_services.length > 0 && (
+        {/* Service */}
+        {provider.provider_services.length > 0 && !isEditing && (
           <p className="text-[#457bed] font-medium mt-2 text-lg">
             {provider.provider_services[0].service.name}
           </p>
         )}
 
+        {modification && !isEditing && (
+          <button
+            onClick={handleEditClick}
+            className="mt-2 text-sm text-blue-600 underline hover:text-blue-800"
+          >
+            Modifier
+          </button>
+        )}
+
+        {/* Inputs en mode édition */}
+        {isEditing && (
+          <div className="mt-4 flex flex-col items-center gap-3">
+            <select
+              value={selectedCategoryId}
+              onChange={(e) => setSelectedCategoryId(e.target.value)}
+              className="border p-2 rounded w-full"
+            >
+              <option value="">Choisir une catégorie</option>
+              {categories.map((cat) => (
+                <option key={cat.id} value={cat.id}>
+                  {cat.name}
+                </option>
+              ))}
+            </select>
+
+            <input
+              type="number"
+              value={experienceYears}
+              onChange={(e) => setExperienceYears(e.target.value)}
+              className="border p-2 rounded w-full"
+              placeholder="Votre année d'expérience dans le domaine"
+              min="0"
+            />
+
+            <button
+              onClick={handleSave}
+              className="bg-green-500 text-white px-4 py-2 rounded mt-2"
+            >
+              Enregistrer
+            </button>
+          </div>
+        )}
+
+        {/* Note moyenne */}
         <div className="flex items-center justify-center mt-4">
           <div className="flex items-center bg-[#457bed]/10 px-4 py-2 rounded-full">
             <svg
