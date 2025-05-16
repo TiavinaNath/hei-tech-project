@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { useParams} from 'next/navigation';
+import { useParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase/client';
 import { getMessagesByConversationId, sendMessage } from '@/lib/supabase/messages';
 import ReviewModal from '@/components/features/review/ReviewModal';
@@ -22,7 +22,6 @@ type Proposal = {
 
 export default function ConversationPage() {
   const { conversationId } = useParams() as { conversationId: string };
-
   const [messages, setMessages] = useState<Message[]>([]);
   const [message, setMessage] = useState('');
   const [userId, setUserId] = useState<string | null>(null);
@@ -34,13 +33,11 @@ export default function ConversationPage() {
 
   const [requestStatus, setRequestStatus] = useState<string | null>(null);
   const [requestId, setRequestId] = useState<string | null>(null);
-
-  const messagesEndRef = useRef<HTMLDivElement | null>(null);
   const [providerId, setProviderId] = useState<string | null>(null);
   const [showReviewModal, setShowReviewModal] = useState(false);
 
+  const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
-  // 1. Get session user
   useEffect(() => {
     const getSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
@@ -49,14 +46,12 @@ export default function ConversationPage() {
     getSession();
   }, []);
 
-  // 2. Load messages
   useEffect(() => {
     if (conversationId) {
       getMessagesByConversationId(conversationId).then(setMessages);
     }
   }, [conversationId]);
 
-  // 3. Subscribe to real-time messages
   useEffect(() => {
     if (!conversationId) return;
     const channel = supabase
@@ -71,59 +66,55 @@ export default function ConversationPage() {
         setMessages((prev) => [...prev, newMessage]);
       })
       .subscribe();
+
     return () => supabase.removeChannel(channel);
   }, [conversationId]);
 
-  // 4. Scroll to bottom
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   }, [messages]);
 
-  // 5. Fetch proposal + request info
-useEffect(() => {
-  const fetchData = async () => {
-    const { data: conv } = await supabase
-      .from('conversations')
-      .select('request_id, provider_id')
-      .eq('id', conversationId)
-      .maybeSingle();
-
-    if (conv) {
-      setRequestId(conv.request_id);
-      setProviderId(conv.provider_id); // 👈
-
-      const { data: proposal } = await supabase
-        .from('final_price_proposals')
-        .select('*')
-        .eq('conversation_id', conversationId)
-        .eq('proposed_by', userId)
-        .order('created_at', { ascending: false })
+  useEffect(() => {
+    const fetchData = async () => {
+      const { data: conv } = await supabase
+        .from('conversations')
+        .select('request_id, provider_id')
+        .eq('id', conversationId)
         .maybeSingle();
 
-      if (proposal) setProposal(proposal);
+      if (conv) {
+        setRequestId(conv.request_id);
+        setProviderId(conv.provider_id);
 
-      const { data: req } = await supabase
-        .from('client_requests')
-        .select('status')
-        .eq('id', conv.request_id)
-        .maybeSingle();
+        const { data: proposal } = await supabase
+          .from('final_price_proposals')
+          .select('*')
+          .eq('conversation_id', conversationId)
+          .eq('proposed_by', userId)
+          .order('created_at', { ascending: false })
+          .maybeSingle();
 
-      if (req?.status) setRequestStatus(req.status);
-    }
-  };
+        if (proposal) setProposal(proposal);
 
-  if (conversationId && userId) fetchData();
-}, [conversationId, userId]);
+        const { data: req } = await supabase
+          .from('client_requests')
+          .select('status')
+          .eq('id', conv.request_id)
+          .maybeSingle();
 
+        if (req?.status) setRequestStatus(req.status);
+      }
+    };
 
-  // Send a chat message
+    if (conversationId && userId) fetchData();
+  }, [conversationId, userId]);
+
   const handleSend = async () => {
     if (!message.trim() || !userId) return;
     await sendMessage({ conversationId, senderId: userId, content: message });
     setMessage('');
   };
 
-  // Send a proposal
   const handleSendProposal = async () => {
     if (!proposalPrice || !userId || !requestId) return;
 
@@ -148,7 +139,6 @@ useEffect(() => {
     }
   };
 
-  // Marquer prestation comme terminée
   const handleCompleteService = async () => {
     if (!requestId) return;
 
@@ -158,108 +148,110 @@ useEffect(() => {
       .eq('id', requestId);
 
     if (!error) {
-      setShowReviewModal(true); // 👉 Affiche le modal au lieu de rediriger
-      setRequestStatus('COMPLETED'); // Met à jour localement le statut
+      setShowReviewModal(true);
+      setRequestStatus('COMPLETED');
     }
   };
 
   return (
-    <div className="p-4 max-w-3xl mx-auto">
-      {/* Messages */}
-      <div className="h-[400px] overflow-y-scroll border rounded p-2 mb-4 bg-white shadow">
+    <div className="max-w-3xl mx-auto p-6">
+      <div className="h-[420px] overflow-y-auto bg-white border rounded-lg shadow-sm p-4 mb-6 space-y-3">
         {messages.map((msg) => (
-          <div
-            key={msg.id}
-            className={`mb-2 ${msg.sender_id === userId ? 'text-right' : 'text-left'}`}
-          >
-            <p className={`inline-block px-3 py-2 rounded ${
-              msg.sender_id === userId ? 'bg-blue-100' : 'bg-gray-100'
+          <div key={msg.id} className={`flex ${msg.sender_id === userId ? 'justify-end' : 'justify-start'}`}>
+            <div className={`px-4 py-2 max-w-[70%] rounded-xl text-sm ${
+              msg.sender_id === userId ? 'bg-blue-500 text-white' : 'bg-gray-200 text-gray-800'
             }`}>
               {msg.content}
-            </p>
+            </div>
           </div>
         ))}
         <div ref={messagesEndRef} />
       </div>
 
-      {/* Formulaire d'envoi */}
-      <div className="flex gap-2 mb-2">
+      {requestStatus !== 'COMPLETED' && (
+      <div className="flex items-center gap-3 mb-4">
         <input
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Écrire un message..."
-          className="flex-1 border px-3 py-2 rounded"
+          className="flex-1 px-4 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
-        <button onClick={handleSend} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+        <button
+          onClick={handleSend}
+          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg font-semibold"
+        >
           Envoyer
         </button>
         {!proposal && (
-          <button onClick={() => setShowProposalForm(true)} className="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
-            Conclure un accord
+          <button
+            onClick={() => setShowProposalForm(true)}
+            className="bg-emerald-600 hover:bg-emerald-700 text-white px-4 py-2 rounded-lg font-semibold"
+          >
+            Proposer un accord
           </button>
         )}
       </div>
+      )}
 
-      {/* Proposition en cours */}
+      
+
       {proposal && (
-        <div className="mb-4 p-3 bg-yellow-50 border rounded">
-          <p className="font-semibold">Votre proposition : {proposal.price} €</p>
-          <p>Note : {proposal.note || '—'}</p>
-          <p>Status : <span className={`font-bold ${
+        <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-lg mb-6">
+          <p className="text-sm font-medium">Votre proposition : <span className="font-bold">{proposal.price} €</span></p>
+          <p className="text-sm">Note : {proposal.note || '—'}</p>
+          <p className="text-sm">Statut : <span className={`font-bold ${
             proposal.status === 'ACCEPTED' ? 'text-green-600' :
-            proposal.status === 'REJECTED' ? 'text-red-600' :
-            'text-gray-600'
+            proposal.status === 'REJECTED' ? 'text-red-600' : 'text-gray-600'
           }`}>{proposal.status}</span></p>
         </div>
       )}
 
-      {/* Formulaire de proposition */}
       {showProposalForm && (
-        <div className="border rounded p-4 bg-gray-50 mb-4 shadow">
-          <h2 className="text-lg font-semibold mb-2">Proposition d’accord</h2>
-          <div className="mb-2">
-            <label className="block mb-1">Prix final (€)</label>
+        <div className="bg-gray-50 border rounded-lg p-4 mb-6 space-y-3 shadow-sm">
+          <h3 className="text-lg font-semibold text-gray-800">Nouvelle proposition</h3>
+          <div>
+            <label className="block text-sm font-medium mb-1">Prix (Ariary)</label>
             <input
               type="number"
               value={proposalPrice}
               onChange={(e) => setProposalPrice(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
-          <div className="mb-2">
-            <label className="block mb-1">Note (optionnelle)</label>
+          <div>
+            <label className="block text-sm font-medium mb-1">Note (optionnelle)</label>
             <textarea
               value={proposalNote}
               onChange={(e) => setProposalNote(e.target.value)}
-              className="w-full border px-3 py-2 rounded"
+              className="w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500"
             />
           </div>
           <button
             onClick={handleSendProposal}
-            className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+            className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold"
           >
             Envoyer la proposition
           </button>
         </div>
       )}
 
-      {/* Prestation terminée */}
-    {proposal?.status === 'ACCEPTED' && requestStatus === 'IN_PROGRESS' && (
-  <button
-    onClick={handleCompleteService}
-    className="bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700"
-  >
-    Marquer la prestation comme terminée
-  </button>
-)}
-    {showReviewModal && providerId && requestId && (
-    <ReviewModal
-      isOpen={showReviewModal}
-      providerId={providerId}
-      requestId={requestId}
-      onClose={() => setShowReviewModal(false)}
-    />
-)}
+      {proposal?.status === 'ACCEPTED' && requestStatus === 'IN_PROGRESS' && (
+        <button
+          onClick={handleCompleteService}
+          className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-semibold mb-4"
+        >
+          Marquer la prestation comme terminée
+        </button>
+      )}
+
+      {showReviewModal && providerId && requestId && (
+        <ReviewModal
+          isOpen={showReviewModal}
+          providerId={providerId}
+          requestId={requestId}
+          onClose={() => setShowReviewModal(false)}
+        />
+      )}
     </div>
   );
 }
