@@ -171,13 +171,23 @@ export async function loginUser(credentials: { email: string, password: string }
             throw new Error('Identifiants invalides')
         }
 
-        console.log("Connexion réussie :", authData)
+        const role = authData?.user?.user_metadata?.role
+
+        console.log("Connexion réussie. Rôle détecté :", role)
+
+        if (role === 'CLIENT') {
+            redirect('/client/dashboard')
+        } else if (role === 'PROVIDER') {
+            redirect('/provider/dashboard')
+        } else {
+            console.warn("Rôle non reconnu :", role)
+            redirect('/') 
+        }
 
     } catch (error) {
         console.error("Erreur dans loginUser:", error)
         throw error
     }
-    redirect('/client/dashboard')
 }
 
 function uuidv4() {
